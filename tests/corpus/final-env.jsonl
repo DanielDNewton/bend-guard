@@ -1,0 +1,15 @@
+// Final round: a value that can reach a later program's environment is never "understood".
+// export, and assignments to names that may already be environment variables, make the call
+// not understood (ask in the main session, refused in agents). Short or lower-case local
+// names keep working.
+{"name": "export before ls is not understood", "tool": "Bash", "args": {"command": "export D=x; ls"}, "expect": "ask", "why": "final round: an export reaches later programs"}
+{"name": "export before ls is refused in an agent", "tool": "Bash", "args": {"command": "export D=x; ls"}, "opts": {"agent": true}, "expect": "deny", "why": "final round: not understood, nobody to ask"}
+{"name": "export of a config variable before pip list", "tool": "Bash", "args": {"command": "export OPENSSL_CONF=tmp/evil.cnf; pip list"}, "expect": "ask", "why": "final round"}
+{"name": "export before curl", "tool": "Bash", "args": {"command": "export FOO=bar; curl -s https://x.y"}, "expect": "ask", "why": "final round"}
+{"name": "long upper-case name may be an environment variable", "tool": "Bash", "args": {"command": "OPENSSL_CONF=tmp/e.cnf; pip list"}, "expect": "ask", "why": "final round: only short or lower-case names are local"}
+{"name": "TZ is read by programs", "tool": "Bash", "args": {"command": "TZ=x; ls"}, "expect": "ask", "why": "final round: short names programs read"}
+{"name": "OS is an environment variable on Windows", "tool": "Bash", "args": {"command": "OS=x; ls"}, "expect": "ask", "why": "final round"}
+{"name": "unset of a possible environment variable", "tool": "Bash", "args": {"command": "unset OPENSSL_CONF; curl -s https://x.y"}, "expect": "ask", "why": "final round: unset uses the same name rule"}
+{"name": "short local name still works", "tool": "Bash", "args": {"command": "D=\"C:/Users/user/bend2_test/src\"; cd \"$D\" && ls"}, "expect": "allow", "why": "everyday form stays understood"}
+{"name": "lower-case local name still works", "tool": "Bash", "args": {"command": "dir=src; ls \"$dir\""}, "expect": "allow", "why": "everyday form stays understood"}
+{"name": "short local name for a file read", "tool": "Bash", "args": {"command": "F=BEND_RULES.md; cat \"$F\""}, "expect": "allow", "why": "everyday form stays understood"}

@@ -1,0 +1,92 @@
+// Round 3, builder git: P1 (git <rev>:<path> reads), the git listings of P8, and the
+// home-derived tool paths of P5 (ModelGit.bend). Enforce, main session, root = project,
+// unless opts say otherwise.
+// P1: <rev>:<path> is GitRead plus a ReadTree of every place the path can name (each
+// possible current folder and its parents for a plain path; the current folder for ./ ../).
+{"name":"P1 git show HEAD:src/a.ts","tool":"Bash","args":{"command":"git show HEAD:src/a.ts"},"expect":"allow","meaning":"Known[GitRead, ReadTree c:/users/user/bend2_test/src/a.ts","why":"P1 rule 1 and 4"}
+{"name":"P1 git show HEAD~3:README.md","tool":"Bash","args":{"command":"git show HEAD~3:README.md"},"expect":"allow","meaning":"ReadTree c:/users/user/bend2_test/readme.md","why":"P1 rule 2: ~ in the revision"}
+{"name":"P1 git cat-file -p main:src/a.ts","tool":"Bash","args":{"command":"git cat-file -p main:src/a.ts"},"expect":"allow","meaning":"ReadTree c:/users/user/bend2_test/src/a.ts","why":"P1 rule 1: cat-file -p"}
+{"name":"P1 git cat-file -t HEAD:src/a.ts","tool":"Bash","args":{"command":"git cat-file -t HEAD:src/a.ts"},"expect":"allow","why":"P1 rule 1: cat-file -t"}
+{"name":"P1 git show :src/a.ts (the index)","tool":"Bash","args":{"command":"git show :src/a.ts"},"expect":"allow","meaning":"ReadTree c:/users/user/bend2_test/src/a.ts","why":"P1 rule 2: an empty revision is the index"}
+{"name":"P1 git diff blob against blob","tool":"Bash","args":{"command":"git diff HEAD:src/a.ts HEAD~1:src/a.ts"},"expect":"allow","meaning":"ReadTree c:/users/user/bend2_test/src/a.ts","why":"P1 rule 1: diff blob against blob"}
+{"name":"P1 git -C src show HEAD:a.ts","tool":"Bash","args":{"command":"git -C src show HEAD:a.ts"},"expect":"allow","meaning":"ReadTree c:/users/user/bend2_test/src/a.ts","why":"P1 rule 1: git -C works as today"}
+{"name":"P1 git --no-pager show HEAD:src/a.ts","tool":"Bash","args":{"command":"git --no-pager show HEAD:src/a.ts"},"expect":"allow","why":"P1 rule 1: a leading --no-pager works as today"}
+{"name":"P1 git show 'HEAD:src/a.ts' quoted","tool":"Bash","args":{"command":"git show 'HEAD:src/a.ts'"},"expect":"allow","why":"P1: the quotes change nothing"}
+{"name":"P1 git show HEAD:src/a.ts | head -50","tool":"Bash","args":{"command":"git show HEAD:src/a.ts | head -50"},"expect":"allow","why":"P1: the common real form"}
+{"name":"P1 git ls-tree HEAD:src","tool":"Bash","args":{"command":"git ls-tree HEAD:src"},"expect":"allow","meaning":"ReadTree c:/users/user/bend2_test/src","why":"P1 rule 1: ls-tree"}
+{"name":"P1 git ls-tree -r --name-only HEAD:src","tool":"Bash","args":{"command":"git ls-tree -r --name-only HEAD:src"},"expect":"allow","why":"P1 rule 1: ls-tree with its flags"}
+{"name":"P1 git rev-parse HEAD:src/a.ts","tool":"Bash","args":{"command":"git rev-parse HEAD:src/a.ts"},"expect":"allow","meaning":"ReadTree c:/users/user/bend2_test/src/a.ts","why":"P1 rule 1: rev-parse"}
+{"name":"P1 PowerShell git show HEAD:src/a.ts","tool":"PowerShell","args":{"command":"git show HEAD:src/a.ts"},"expect":"allow","meaning":"ReadTree c:/users/user/bend2_test/src/a.ts","why":"P1 tests: PowerShell"}
+// rule 2 zones: every candidate is a read, so a zone file named by the path is refused
+{"name":"P1 git show HEAD:.env is denied","tool":"Bash","args":{"command":"git show HEAD:.env"},"expect":"deny","meaning":"ReadTree c:/users/user/bend2_test/.env","why":"P1 tests: rule 2 NoReadOrChange .env"}
+{"name":"P1 git show HEAD:.env in log-only is allowed (would deny)","tool":"Bash","args":{"command":"git show HEAD:.env"},"opts":{"logOnly":true},"expect":"allow","why":"P1 tests: log-only allows a Known meaning and logs the would-deny"}
+{"name":"P1 agent git show HEAD:.env is denied","tool":"Bash","args":{"command":"git show HEAD:.env"},"opts":{"agent":true},"expect":"deny","why":"P1 tests: agent"}
+{"name":"P1 git cat-file -p HEAD:.env is denied","tool":"Bash","args":{"command":"git cat-file -p HEAD:.env"},"expect":"deny","why":"P1: rule 2 through cat-file"}
+{"name":"P1 git rev-parse HEAD:.env is denied","tool":"Bash","args":{"command":"git rev-parse HEAD:.env"},"expect":"deny","why":"P1 rule 4: the hash of a short secret file can give it away"}
+{"name":"P1 git diff HEAD:.env HEAD~1:.env is denied","tool":"Bash","args":{"command":"git diff HEAD:.env HEAD~1:.env"},"expect":"deny","why":"P1: rule 2 through diff"}
+{"name":"P1 git show HEAD:secrets from the root is denied","tool":"Bash","args":{"command":"git show HEAD:secrets"},"expect":"deny","why":"P1: rule 2 NoReadOrChange secrets"}
+{"name":"P1 cwd src: git show HEAD:secrets/k.txt is denied","tool":"Bash","args":{"command":"git show HEAD:secrets/k.txt"},"opts":{"cwds":["C:\\Users\\user\\bend2_test\\src"]},"expect":"deny","meaning":"ReadTree c:/users/user/bend2_test/secrets/k.txt","why":"P1 rule 4: a plain path is read from every parent folder"}
+{"name":"P1 cwd src: git show HEAD:./a.ts","tool":"Bash","args":{"command":"git show HEAD:./a.ts"},"opts":{"cwds":["C:\\Users\\user\\bend2_test\\src"]},"expect":"allow","meaning":"Known[GitRead, ReadTree c:/users/user/bend2_test/src/a.ts]","why":"P1 rule 4: ./ is read from the current folder only"}
+{"name":"P1 cwd src: git show HEAD:../.env is denied","tool":"Bash","args":{"command":"git show HEAD:../.env"},"opts":{"cwds":["C:\\Users\\user\\bend2_test\\src"]},"expect":"deny","meaning":"ReadTree c:/users/user/bend2_test/.env","why":"P1 rule 3 and 4: ../ from the current folder"}
+{"name":"P1 git -C src show HEAD:../secrets/x is denied","tool":"Bash","args":{"command":"git -C src show HEAD:../secrets/x"},"expect":"deny","why":"P1: ../ from the -C folder"}
+{"name":"P1 git ls-tree HEAD: reads every parent folder, so it is denied","tool":"Bash","args":{"command":"git ls-tree HEAD:"},"expect":"deny","meaning":"ReadTree c:/users/user,","why":"P1 rule 3 and 4: an empty path is '.', and the home folder (holding bend-guard's key) may be the repository's top"}
+// Clef veto zone: the read of specs is Consulted under the existing veto rules
+{"name":"P1 git show HEAD:specs/a.md with no Clef answer asks","tool":"Bash","args":{"command":"git show HEAD:specs/a.md"},"expect":"ask","meaning":"ReadTree c:/users/user/bend2_test/specs/a.md","why":"existing veto rule: cat specs/a.md asks with NoAnswer (policy-clef.jsonl)"}
+{"name":"P1 git show HEAD:specs/a.md with a low Clef answer is allowed","tool":"Bash","args":{"command":"git show HEAD:specs/a.md"},"answer":{"risky":0,"unsure":0},"expect":"allow","why":"existing veto rule: Allow with low risk"}
+{"name":"P1 agent git show HEAD:specs/a.md with no answer is allowed","tool":"Bash","args":{"command":"git show HEAD:specs/a.md"},"opts":{"agent":true},"expect":"allow","why":"existing veto rule: agents are never sent to Clef"}
+// forms that stay Unknown (ask), each with a reason that names the form
+{"name":"P1 git show :/fix asks","tool":"Bash","args":{"command":"git show :/fix"},"expect":"ask","meaning":"searches commit messages","why":"P1 rule 2: :/text"}
+{"name":"P1 git show :1:src/a.ts asks","tool":"Bash","args":{"command":"git show :1:src/a.ts"},"expect":"ask","meaning":"stage number","why":"P1 rule 2: :N:path"}
+{"name":"P1 git show HEAD:src/*.ts asks","tool":"Bash","args":{"command":"git show HEAD:src/*.ts"},"expect":"ask","meaning":"wildcards","why":"P1 rule 3: wildcard"}
+{"name":"P1 git cat-file --textconv HEAD:a.ts asks","tool":"Bash","args":{"command":"git cat-file --textconv HEAD:a.ts"},"expect":"ask","meaning":"--textconv","why":"P1 rule 5"}
+{"name":"P1 git show HEAD:src/a.ts --output=x asks","tool":"Bash","args":{"command":"git show HEAD:src/a.ts --output=x"},"expect":"ask","meaning":"--output=x","why":"P1 rule 5"}
+{"name":"P1 git show HEAD@{2}:a.ts asks","tool":"Bash","args":{"command":"git show HEAD@{2}:a.ts"},"expect":"ask","why":"P1 rule 2: rev@{...}"}
+{"name":"P1 git show 'HEAD@{2}:a.ts' quoted asks","tool":"Bash","args":{"command":"git show 'HEAD@{2}:a.ts'"},"expect":"ask","meaning":"rev@{...}","why":"P1 rule 2: rev@{...}"}
+{"name":"P1 git show HEAD:src/../.env asks","tool":"Bash","args":{"command":"git show HEAD:src/../.env"},"expect":"deny","meaning":"'..' in the path","why":"P1 rule 3: .. only in the ./ or ../ form; round 3, P3: an unknown shell command that names a no-read zone is refused (was ask)"}
+{"name":"P1 git show 'HEAD:a%b' asks","tool":"Bash","args":{"command":"git show 'HEAD:a%b'"},"expect":"ask","meaning":"plain relative path","why":"P1 rule 3: no %"}
+{"name":"P1 git show 'HEAD:src\\a.ts' asks","tool":"Bash","args":{"command":"git show 'HEAD:src\\a.ts'"},"expect":"ask","meaning":"backslash","why":"P1 rule 3: no backslash"}
+{"name":"P1 git show HEAD:src/a.ts with no known folder asks","tool":"Bash","args":{"command":"git show HEAD:src/a.ts"},"opts":{"cwds":[]},"expect":"ask","meaning":"cannot tell which files","why":"P1 rule 4: no folder to read the path from"}
+{"name":"P1 git cat-file blob HEAD:src/a.ts asks","tool":"Bash","args":{"command":"git cat-file blob HEAD:src/a.ts"},"expect":"ask","why":"P1 rule 1: only cat-file -p -t -s -e"}
+{"name":"P1 cwd src: git diff with ../ asks","tool":"Bash","args":{"command":"git diff HEAD:../x HEAD:a.ts"},"opts":{"cwds":["C:\\Users\\user\\bend2_test\\src"]},"expect":"ask","meaning":"not at all in git diff","why":"P1: diff may take an operand that leaves the repository for a file outside it"}
+{"name":"P1 git log HEAD:src/a.ts keeps the colon rule","tool":"Bash","args":{"command":"git log HEAD:src/a.ts"},"expect":"ask","meaning":"a ':' in a path","why":"P1 rule 6: other subcommands"}
+{"name":"P1 git show HEAD -- x:y keeps the colon rule","tool":"Bash","args":{"command":"git show HEAD -- x:y"},"expect":"ask","meaning":"a ':' in a path","why":"P1 rule 6: pathspecs after --"}
+{"name":"P1 git show HEAD:~/.claude/settings.json is denied","tool":"Bash","args":{"command":"git show HEAD:~/.claude/settings.json"},"expect":"deny","why":"P1 tests: named-path self-protection"}
+// P8: git listings (GitRead); creating or changing forms stay Unknown
+{"name":"P8 git tag","tool":"Bash","args":{"command":"git tag"},"expect":"allow","meaning":"Known[GitRead]","why":"P8: tag with no args"}
+{"name":"P8 git tag -l","tool":"Bash","args":{"command":"git tag -l"},"expect":"allow","why":"P8: tag -l"}
+{"name":"P8 git tag --list 'v1.*'","tool":"Bash","args":{"command":"git tag --list 'v1.*'"},"expect":"allow","why":"P8: tag --list PATTERN"}
+{"name":"P8 git tag -n","tool":"Bash","args":{"command":"git tag -n"},"expect":"allow","why":"P8: tag -n"}
+{"name":"P8 git tag -n5","tool":"Bash","args":{"command":"git tag -n5"},"expect":"allow","why":"P8: tag -nN"}
+{"name":"P8 git tag --contains HEAD","tool":"Bash","args":{"command":"git tag --contains HEAD"},"expect":"allow","why":"P8: tag --contains X"}
+{"name":"P8 git tag --sort=-creatordate","tool":"Bash","args":{"command":"git tag --sort=-creatordate"},"expect":"allow","why":"P8: tag --sort=X"}
+{"name":"P8 git tag -l --sort=version:refname","tool":"Bash","args":{"command":"git tag -l --sort=version:refname"},"expect":"allow","why":"P8: tag --sort=X"}
+{"name":"P8 git tag --points-at HEAD","tool":"Bash","args":{"command":"git tag --points-at HEAD"},"expect":"allow","why":"P8: tag --points-at X"}
+{"name":"P8 git tag v1 asks","tool":"Bash","args":{"command":"git tag v1"},"expect":"ask","meaning":"makes a tag","why":"P8 tests: a name to create"}
+{"name":"P8 git tag -d v1 asks","tool":"Bash","args":{"command":"git tag -d v1"},"expect":"ask","why":"P8 tests: -d"}
+{"name":"P8 git tag -a v1 -m x asks","tool":"Bash","args":{"command":"git tag -a v1 -m x"},"expect":"ask","why":"P8: -a"}
+{"name":"P8 git tag -f v1 asks","tool":"Bash","args":{"command":"git tag -f v1"},"expect":"ask","why":"P8: -f"}
+{"name":"P8 git worktree list","tool":"Bash","args":{"command":"git worktree list"},"expect":"allow","meaning":"Known[GitRead]","why":"P8: worktree list"}
+{"name":"P8 git worktree list --porcelain","tool":"Bash","args":{"command":"git worktree list --porcelain"},"expect":"allow","why":"P8: worktree list --porcelain"}
+{"name":"P8 git worktree remove x asks","tool":"Bash","args":{"command":"git worktree remove x"},"expect":"ask","meaning":"worktree list","why":"P8: only list"}
+{"name":"P8 git cherry","tool":"Bash","args":{"command":"git cherry"},"expect":"allow","why":"P8: cherry"}
+{"name":"P8 git cherry -v main","tool":"Bash","args":{"command":"git cherry -v main"},"expect":"allow","why":"P8: cherry -v A"}
+{"name":"P8 git cherry main feature","tool":"Bash","args":{"command":"git cherry main feature"},"expect":"allow","why":"P8: cherry A B"}
+{"name":"P8 git cherry a b c asks","tool":"Bash","args":{"command":"git cherry a b c"},"expect":"ask","why":"P8: two revisions at most"}
+{"name":"P8 git count-objects","tool":"Bash","args":{"command":"git count-objects"},"expect":"allow","why":"P8: count-objects"}
+{"name":"P8 git count-objects -vH","tool":"Bash","args":{"command":"git count-objects -vH"},"expect":"allow","why":"P8: count-objects -v -H"}
+{"name":"P8 git count-objects x asks","tool":"Bash","args":{"command":"git count-objects x"},"expect":"ask","why":"P8: no operand"}
+{"name":"P8 git ls-remote","tool":"Bash","args":{"command":"git ls-remote"},"expect":"allow","why":"P8: ls-remote"}
+{"name":"P8 git ls-remote --heads origin","tool":"Bash","args":{"command":"git ls-remote --heads origin"},"expect":"allow","why":"P8: ls-remote --heads remote"}
+{"name":"P8 git ls-remote --tags --refs origin","tool":"Bash","args":{"command":"git ls-remote --tags --refs origin"},"expect":"allow","why":"P8: ls-remote --tags --refs remote"}
+{"name":"P8 git ls-remote https URL","tool":"Bash","args":{"command":"git ls-remote https://github.com/anthropics/claude-code.git"},"expect":"allow","why":"P8: ls-remote https URL"}
+{"name":"P8 git ls-remote ../other asks","tool":"Bash","args":{"command":"git ls-remote ../other"},"expect":"ask","meaning":"not a plain remote name","why":"P8 tests: a path"}
+{"name":"P8 git ls-remote ext:: asks","tool":"Bash","args":{"command":"git ls-remote 'ext::sh -c x'"},"expect":"ask","why":"P8: ext:: runs a program"}
+{"name":"P8 git ls-remote file URL asks","tool":"Bash","args":{"command":"git ls-remote file:///c/x"},"expect":"ask","why":"P8: another scheme"}
+{"name":"P8 git ls-remote scp form asks","tool":"Bash","args":{"command":"git ls-remote git@github.com:a/b.git"},"expect":"ask","why":"P8: another scheme"}
+{"name":"P8 git ls-remote --upload-pack asks","tool":"Bash","args":{"command":"git ls-remote --upload-pack=x origin"},"expect":"ask","why":"P8: --upload-pack runs a program"}
+{"name":"P8 git ls-remote origin main asks","tool":"Bash","args":{"command":"git ls-remote origin main"},"expect":"ask","why":"P8: patterns are not modelled"}
+// P5: the approve and draft-check tools are placed under the call's home folder
+{"name":"P5 the user's draft check","tool":"Bash","args":{"command":"node C:/Users/user/.claude/local-plugins/bend-guard/tools/draft-check.mjs x"},"expect":"allow","meaning":"DraftCheck","why":"P5: unchanged for the user"}
+{"name":"P5 another user's draft check","tool":"Bash","args":{"command":"node C:/Users/other/.claude/local-plugins/bend-guard/tools/draft-check.mjs x"},"opts":{"home":"C:\\Users\\other","root":"C:\\Users\\other\\bend2_test","cwds":["C:\\Users\\other\\bend2_test"]},"expect":"allow","meaning":"DraftCheck","why":"P5: the draft check is found under the call's home"}
+{"name":"P5 another user's approve tool is denied","tool":"Bash","args":{"command":"node C:/Users/other/.claude/local-plugins/bend-guard/tools/approve.mjs x"},"opts":{"home":"C:\\Users\\other","root":"C:\\Users\\other\\bend2_test","cwds":["C:\\Users\\other\\bend2_test"]},"expect":"deny","meaning":"WriteTree c:/users/other/.claude/bend-guard","why":"P5: the approve step is the user's alone, under any home"}
+{"name":"P5 another user's approve tool by a relative path is denied","tool":"Bash","args":{"command":"node tools/approve.mjs x"},"opts":{"home":"C:\\Users\\other","root":"C:\\Users\\other\\bend2_test","cwds":["C:\\Users\\other\\.claude\\local-plugins\\bend-guard"]},"expect":"deny","why":"P5: the approve step is the user's alone, under any home"}

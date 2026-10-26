@@ -1,0 +1,5 @@
+{
+  "name": "bend-guard-skill-probe",
+  "version": "0.0.1",
+  "description": "Test-only: a context:fork skill that runs one allowed Bash command, so tests/live/run.mjs can see whether bend-guard's tool.check fires in a Skill-run agent."
+}

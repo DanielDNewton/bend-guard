@@ -1,0 +1,63 @@
+// Built-in asks and denies (plan Task 2.1 rule_verdict "(built in)" row; design.md component 3 D5;
+// Settled choices; build notes: .git/hooks and .git/config of any repository; .gitattributes asks;
+// npm install / npm test / RunScript ask unless a TrustScript rule trusts the script).
+// git hooks and git config: deny
+{"name": "builtin Write .git/hooks/pre-push is denied", "tool": "Write", "args": {"file_path": ".git\\hooks\\pre-push", "content": "x"}, "expect": "deny", "why": "plan 2.1"}
+{"name": "builtin Edit .git/config is denied", "tool": "Edit", "args": {"file_path": ".git\\config", "old_string": "a", "new_string": "b"}, "expect": "deny", "why": "plan 2.1"}
+{"name": "builtin echo > .git/hooks/post-checkout is denied", "tool": "Bash", "args": {"command": "echo x > .git/hooks/post-checkout"}, "expect": "deny", "why": "D5"}
+{"name": "builtin cp into .git/hooks is denied", "tool": "Bash", "args": {"command": "cp evil.sh .git/hooks/pre-commit"}, "expect": "deny", "why": "D5"}
+{"name": "builtin rm -rf .git/hooks is denied", "tool": "Bash", "args": {"command": "rm -rf .git/hooks"}, "expect": "deny", "why": "D5 (and rule 7)"}
+{"name": "builtin upper-case .GIT/HOOKS is denied", "tool": "Write", "args": {"file_path": ".GIT\\HOOKS\\pre-push", "content": "x"}, "expect": "deny", "why": "case-insensitive"}
+{"name": "builtin .git/config with a trailing dot is denied", "tool": "Write", "args": {"file_path": ".git\\config.", "content": "x"}, "expect": "deny", "why": "Windows drops trailing dots"}
+{"name": "builtin hooks of another repository are denied", "tool": "Write", "args": {"file_path": "C:\\Users\\user\\other\\.git\\hooks\\pre-commit", "content": "x"}, "expect": "deny", "why": "build notes: any repository"}
+{"name": "builtin config of a nested repository is denied", "tool": "Write", "args": {"file_path": "src\\vendor\\lib\\.git\\config", "content": "x"}, "expect": "deny", "why": "build notes: any repository"}
+{"name": "builtin Write ~/.gitconfig is denied", "tool": "Write", "args": {"file_path": "C:\\Users\\user\\.gitconfig", "content": "x"}, "expect": "deny", "why": "plan 2.1"}
+{"name":"builtin git config --global is denied (git config writes are self-protection)","tool":"Bash","args":{"command":"git config --global core.hooksPath /tmp/h"},"expect":"deny","why":"ADJ-1 (round 2): a git config write is refused (self-protection; was ask)"}
+{"name": "builtin git config --global in an agent is denied", "tool": "Bash", "args": {"command": "git config --global core.hooksPath /tmp/h"}, "opts": {"agent": true}, "expect": "deny", "why": "Unknown, no person"}
+{"name": "builtin Write ~/.config/git/config is denied", "tool": "Write", "args": {"file_path": "C:\\Users\\user\\.config\\git\\config", "content": "x"}, "expect": "deny", "why": "D5"}
+{"name": "builtin Write ~/.config/git/attributes is denied", "tool": "Write", "args": {"file_path": "C:\\Users\\user\\.config\\git\\attributes", "content": "x"}, "expect": "deny", "why": "D5: anything under ~/.config/git"}
+{"name": "builtin submodule hooks in .git/modules are denied", "tool": "Write", "args": {"file_path": ".git\\modules\\lib\\hooks\\post-checkout", "content": "x"}, "expect": "deny", "why": "a submodule's hooks run like the project's; design D5 'writing to .git\\hooks in any project'"}
+{"name": "builtin submodule config in .git/modules is denied", "tool": "Write", "args": {"file_path": ".git\\modules\\lib\\config", "content": "x"}, "expect": "deny", "why": "a submodule's config can set core.hooksPath and filters; D5"}
+{"name": "builtin .git/config.worktree is denied", "tool": "Write", "args": {"file_path": ".git\\config.worktree", "content": "x"}, "expect": "deny", "why": "git reads config.worktree as repository config (extensions.worktreeConfig); D5"}
+{"name": "builtin .git/HEAD is not a built-in deny", "tool": "Write", "args": {"file_path": ".git\\HEAD", "content": "ref: refs/heads/x"}, "expect": "allow", "why": "not hooks or config"}
+{"name": "builtin .git/hooks.txt sibling is not hooks", "tool": "Write", "args": {"file_path": "docs\\git\\hooks\\readme.md", "content": "x"}, "expect": "allow", "why": "no .git segment before hooks"}
+{"name": "builtin a file named config outside .git is allowed", "tool": "Write", "args": {"file_path": "src\\config", "content": "x"}, "expect": "allow", "why": "no .git segment"}
+{"name": "builtin ~/.gitconfig.bak is not ~/.gitconfig", "tool": "Write", "args": {"file_path": "C:\\Users\\user\\.gitconfig.bak", "content": "x"}, "expect": "allow", "why": "sibling with a similar name"}
+{"name": "builtin Read .git/config is allowed", "tool": "Read", "args": {"file_path": ".git\\config"}, "expect": "allow", "why": "only changes are denied"}
+{"name": "builtin git hooks deny in an agent", "tool": "Write", "args": {"file_path": ".git\\hooks\\pre-push", "content": "x"}, "opts": {"agent": true}, "expect": "deny", "why": "D5"}
+{"name": "builtin git hooks deny after the user said yes", "tool": "Write", "args": {"file_path": ".git\\hooks\\pre-push", "content": "x"}, "opts": {"stage": {"asked": true}}, "expect": "deny", "why": "a Deny is never turned into Allow at call time"}
+// .gitattributes: ask
+{"name": "builtin Edit .gitattributes asks", "tool": "Edit", "args": {"file_path": ".gitattributes", "old_string": "a", "new_string": "b"}, "expect": "ask", "why": "plan 2.1"}
+{"name": "builtin Write a nested .gitattributes asks", "tool": "Write", "args": {"file_path": "src\\.gitattributes", "content": "* text"}, "expect": "ask", "why": "build notes: any .gitattributes"}
+{"name": "builtin echo >> .gitattributes asks", "tool": "Bash", "args": {"command": "echo '*.x filter=evil' >> .gitattributes"}, "expect": "ask", "why": "D5"}
+{"name": "builtin .gitattributes in an agent is denied", "tool": "Write", "args": {"file_path": ".gitattributes", "content": "x"}, "opts": {"agent": true}, "expect": "deny", "why": "Ask becomes Deny without a person"}
+{"name": "builtin .gitattributes after the user said yes is allowed", "tool": "Write", "args": {"file_path": ".gitattributes", "content": "x"}, "opts": {"stage": {"asked": true}}, "expect": "allow", "why": "finish: Ask becomes Allow when the user said yes"}
+{"name": "builtin Read .gitattributes is allowed", "tool": "Read", "args": {"file_path": ".gitattributes"}, "expect": "allow", "why": "only changes ask"}
+{"name": "builtin .git/info/attributes asks like .gitattributes", "tool": "Write", "args": {"file_path": ".git\\info\\attributes", "content": "* filter=evil"}, "expect": "ask", "why": "git reads .git/info/attributes exactly like .gitattributes (D5 ask)"}
+// npm: every install asks, scripts ask unless trusted
+{"name": "builtin npm install asks", "tool": "Bash", "args": {"command": "npm install"}, "expect": "ask", "meaning": "NpmInstall", "why": "plan 2.1: npm install Ask with the lifecycle reason"}
+{"name": "builtin npm i asks", "tool": "Bash", "args": {"command": "npm i"}, "expect": "ask", "why": "every npm install asks"}
+{"name": "builtin npm ci asks", "tool": "Bash", "args": {"command": "npm ci"}, "expect": "ask", "why": "plan 2.1"}
+{"name": "builtin npm install lodash asks", "tool": "Bash", "args": {"command": "npm install lodash"}, "expect": "ask", "why": "rule 8 and D3"}
+{"name": "builtin npm install -D typescript asks", "tool": "Bash", "args": {"command": "npm install -D typescript"}, "expect": "ask", "why": "every npm install"}
+{"name": "builtin npm add asks", "tool": "Bash", "args": {"command": "npm add lodash"}, "expect": "ask", "why": "npm add is install"}
+{"name": "builtin npm install --ignore-scripts still asks", "tool": "Bash", "args": {"command": "npm install --ignore-scripts lodash"}, "expect": "ask", "why": "rule 8: every new package is asked"}
+{"name": "builtin npm install in PowerShell asks", "tool": "PowerShell", "args": {"command": "npm install lodash"}, "expect": "ask", "why": "every npm install"}
+{"name": "builtin npm install in an agent is denied", "tool": "Bash", "args": {"command": "npm install lodash"}, "opts": {"agent": true}, "expect": "deny", "why": "no person"}
+{"name": "builtin npm install with a low Clef answer still asks", "tool": "Bash", "args": {"command": "npm install"}, "answer": {"risky": 0, "unsure": 0}, "expect": "ask", "why": "Clef cannot loosen"}
+{"name": "builtin npm test asks", "tool": "Bash", "args": {"command": "npm test"}, "expect": "ask", "meaning": "RunScript", "why": "plan 2.1: npm test Ask (no TrustScript in the fixture)"}
+{"name": "builtin npm run lint asks", "tool": "Bash", "args": {"command": "npm run lint"}, "expect": "ask", "why": "settled: npm run lint asks"}
+{"name": "builtin npm run build asks", "tool": "Bash", "args": {"command": "npm run build"}, "expect": "ask", "why": "RunScript with no TrustScript"}
+{"name": "builtin npm start asks", "tool": "Bash", "args": {"command": "npm start"}, "expect": "ask", "why": "runs a package.json script"}
+{"name": "builtin npm test from a sub-folder asks", "tool": "Bash", "args": {"command": "npm test"}, "opts": {"cwds": ["C:\\Users\\user\\bend2_test\\src"]}, "expect": "ask", "why": "no TrustScript"}
+{"name": "builtin npm test in an agent is denied", "tool": "Bash", "args": {"command": "npm test"}, "opts": {"agent": true}, "expect": "deny", "why": "no person"}
+{"name": "builtin npm test after the user said yes is allowed", "tool": "Bash", "args": {"command": "npm test"}, "opts": {"stage": {"asked": true}}, "expect": "allow", "why": "The user approved this exact call"}
+{"name": "builtin npm test outside any project asks", "tool": "Bash", "args": {"command": "npm test"}, "opts": {"root": "C:\\Users\\user\\other", "cwds": ["C:\\Users\\user\\other"]}, "expect": "ask", "why": "build notes: trusted only inside a project with a TrustScript rule"}
+{"name": "builtin npx asks (not understood)", "tool": "Bash", "args": {"command": "npx some-tool"}, "expect": "ask", "why": "runs downloaded code; unknown"}
+{"name": "builtin yarn install asks", "tool": "Bash", "args": {"command": "yarn install"}, "expect": "ask", "why": "unknown or install; never allow"}
+{"name": "builtin npm install then rm -rf specs is denied", "tool": "Bash", "args": {"command": "npm install && rm -rf specs"}, "expect": "deny", "why": "strictest hit wins"}
+// Tools that touch no files
+{"name": "builtin TodoWrite is allowed", "tool": "TodoWrite", "args": {"todos": [{"content": "x", "status": "pending"}]}, "expect": "allow", "why": "settled: tools that touch no files are allowed"}
+{"name": "builtin Skill (another skill) is allowed", "tool": "Skill", "args": {"skill": "superpowers:brainstorming"}, "expect": "allow", "why": "settled: Skill is allowed"}
+{"name": "builtin WebFetch is allowed", "tool": "WebFetch", "args": {"url": "https://example.com", "prompt": "x"}, "expect": "allow", "why": "settled: WebFetch allowed"}
+{"name": "builtin an unmodelled built-in tool asks", "tool": "NewFancyTool", "args": {"x": "y"}, "expect": "ask", "why": "S2: a tool the translator doesn't model is unknown"}

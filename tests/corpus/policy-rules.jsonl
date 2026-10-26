@@ -1,0 +1,164 @@
+// Project rules of the bend2_test fixture (BEND_RULES.md lines 1-3, 5-7), each at its boundary:
+// inside, the folder itself, a sibling with a similar name, above it. Sources: design.md
+// component 3, plan.md Task 2.1 rule_verdict table and Task 2.5 corpus, build notes.
+// Rule 1: NoChange specs
+{"name": "rule1 Edit inside specs is denied", "tool": "Edit", "args": {"file_path": "specs\\a.md", "old_string": "a", "new_string": "b"}, "expect": "deny", "why": "plan 2.5: Edit specs\\a.md Deny"}
+{"name": "rule1 Write absolute path inside specs is denied", "tool": "Write", "args": {"file_path": "C:\\Users\\user\\bend2_test\\specs\\a.md", "content": "x"}, "expect": "deny", "why": "specs_protected"}
+{"name": "rule1 Write deep inside specs is denied", "tool": "Write", "args": {"file_path": "C:\\Users\\user\\bend2_test\\specs\\v2\\deep\\a.md", "content": "x"}, "expect": "deny", "why": "specs_protected: anything under specs"}
+{"name": "rule1 rm -rf specs is denied", "tool": "Bash", "args": {"command": "rm -rf specs"}, "expect": "deny", "meaning": "DeleteTree c:/users/user/bend2_test/specs", "why": "plan 2.5"}
+{"name": "rule1 rm -rf specs. (trailing dot) is denied", "tool": "Bash", "args": {"command": "rm -rf specs."}, "expect": "deny", "why": "plan 2.5: rm -rf specs. Deny"}
+{"name": "rule1 touch specs (the folder itself) is denied", "tool": "Bash", "args": {"command": "touch specs"}, "expect": "deny", "why": "a change of exactly specs is under specs"}
+{"name": "rule1 mkdir inside specs is denied", "tool": "Bash", "args": {"command": "mkdir specs/new"}, "expect": "deny", "why": "no write under specs"}
+{"name": "rule1 mv specs away is denied", "tool": "Bash", "args": {"command": "mv specs x"}, "expect": "deny", "why": "plan 2.5: mv specs x Deny"}
+{"name": "rule1 mv a file into specs is denied", "tool": "Bash", "args": {"command": "mv x.md specs/"}, "expect": "deny", "why": "design 4: mv x specs is Write{specs}, under specs"}
+{"name": "rule1 cp a file into specs is denied", "tool": "Bash", "args": {"command": "cp a.txt specs/a.txt"}, "expect": "deny", "why": "no write under specs"}
+{"name": "rule1 git checkout -- specs file is denied", "tool": "Bash", "args": {"command": "git checkout -- specs/a.md"}, "expect": "deny", "why": "plan 2.5"}
+{"name": "rule1 git restore specs is denied", "tool": "Bash", "args": {"command": "git restore specs"}, "expect": "deny", "why": "plan 2.5"}
+{"name": "rule1 cd specs && rm a.md is denied", "tool": "Bash", "args": {"command": "cd specs && rm a.md"}, "expect": "deny", "why": "plan 2.5"}
+{"name": "rule1 cd specs; rm a.md is denied", "tool": "Bash", "args": {"command": "cd specs; rm a.md"}, "expect": "deny", "why": "plan 2.5"}
+{"name": "rule1 rm a.md with a possible shell folder in specs is denied", "tool": "Bash", "args": {"command": "rm a.md"}, "opts": {"cwds": ["C:\\Users\\user\\bend2_test", "C:\\Users\\user\\bend2_test\\specs"]}, "expect": "deny", "why": "plan 2.5: rm a.md with cwds [T, T/specs] Deny"}
+{"name": "rule1 upper-case Specs is the same folder", "tool": "Edit", "args": {"file_path": "C:\\Users\\user\\bend2_test\\Specs\\A.MD", "old_string": "a", "new_string": "b"}, "expect": "deny", "why": "Windows paths ignore case"}
+{"name": "rule1 forward slashes reach specs", "tool": "Write", "args": {"file_path": "C:/Users/user/bend2_test/specs/a.md", "content": "x"}, "expect": "deny", "why": "same path"}
+{"name": "rule1 Git Bash /c/ path reaches specs", "tool": "Write", "args": {"file_path": "/c/Users/user/bend2_test/specs/a.md", "content": "x"}, "expect": "deny", "why": "same path"}
+{"name": "rule1 dot-dot detour reaches specs", "tool": "Edit", "args": {"file_path": "src\\..\\specs\\a.md", "old_string": "a", "new_string": "b"}, "expect": "deny", "why": "normalised path is under specs"}
+{"name": "rule1 trailing dot on the folder reaches specs", "tool": "Write", "args": {"file_path": "C:\\Users\\user\\bend2_test\\specs.\\a.md", "content": "x"}, "expect": "deny", "why": "Windows drops trailing dots"}
+{"name": "rule1 trailing space on the folder reaches specs", "tool": "Write", "args": {"file_path": "C:\\Users\\user\\bend2_test\\specs \\a.md", "content": "x"}, "expect": "deny", "why": "Windows drops trailing spaces; never allowed"}
+{"name": "rule1 sibling specs2 is not protected", "tool": "Edit", "args": {"file_path": "specs2\\a.md", "old_string": "a", "new_string": "b"}, "expect": "allow", "why": "rule names specs only; a sibling with a similar name is not under it"}
+{"name": "rule1 sibling specs.bak is not protected", "tool": "Write", "args": {"file_path": "specs.bak\\a.md", "content": "x"}, "expect": "allow", "why": "not under specs"}
+{"name": "rule1 sibling spec is not protected", "tool": "Write", "args": {"file_path": "spec\\a.md", "content": "x"}, "expect": "allow", "why": "not under specs"}
+{"name": "rule1 nested src/specs is not the rule folder", "tool": "Write", "args": {"file_path": "src\\specs\\a.md", "content": "x"}, "expect": "allow", "why": "rel is from the project root"}
+{"name": "rule1 a file in the project root is allowed", "tool": "Write", "args": {"file_path": "notes.md", "content": "x"}, "expect": "allow", "why": "no rule names it"}
+{"name": "rule1 cp into the project root does not change specs", "tool": "Bash", "args": {"command": "cp src/a.txt ."}, "expect": "allow", "why": "design 4: Write{.} changes only the folder entry, the copy is allowed"}
+{"name": "rule1 Read tool inside specs is allowed with no Clef", "tool": "Read", "args": {"file_path": "specs\\a.md"}, "answer": {"risky": 999, "unsure": 999}, "expect": "allow", "why": "plan 2.5: Read of specs/a.md Allow, no Consult (not a shell tool)"}
+{"name": "rule1 cat inside specs, Clef low, is allowed", "tool": "Bash", "args": {"command": "cat specs/a.md"}, "answer": {"risky": 10, "unsure": 10}, "expect": "allow", "why": "plan 2.5: cat specs/a.md Consult Veto, Allow with low risk"}
+{"name": "rule1 cat inside specs, no Clef answer, asks", "tool": "Bash", "args": {"command": "cat specs/a.md"}, "expect": "ask", "why": "plan 2.5: Ask with NoAnswer"}
+{"name":"rule1 sed -i on specs is denied","tool":"Bash","args":{"command":"sed -i s/a/b/ specs/a.md"},"expect":"deny","why":"round 2 (P9): sed -i is modelled as a write of specs/a.md, so rule 1 refuses it"}
+{"name": "rule1 sed -i on specs in an agent is denied", "tool": "Bash", "args": {"command": "sed -i s/a/b/ specs/a.md"}, "opts": {"agent": true}, "expect": "deny", "why": "unknown, no person in an agent"}
+// Rule 2: NoReadOrChange .env and secrets
+{"name": "rule2 cat .env is denied", "tool": "Bash", "args": {"command": "cat .env"}, "expect": "deny", "why": "plan 2.5"}
+{"name": "rule2 Read tool .env is denied", "tool": "Read", "args": {"file_path": "C:\\Users\\user\\bend2_test\\.env"}, "expect": "deny", "why": "env_unreadable"}
+{"name": "rule2 Edit .env is denied", "tool": "Edit", "args": {"file_path": ".env", "old_string": "a", "new_string": "b"}, "expect": "deny", "why": "env_protected"}
+{"name": "rule2 echo >> .env is denied", "tool": "Bash", "args": {"command": "echo X=1 >> .env"}, "expect": "deny", "why": "env_protected"}
+{"name": "rule2 upper-case .ENV is denied", "tool": "Read", "args": {"file_path": ".ENV"}, "expect": "deny", "why": "Windows paths ignore case"}
+{"name": "rule2 .env with a trailing dot is denied", "tool": "Read", "args": {"file_path": ".env."}, "expect": "deny", "why": "Windows drops trailing dots"}
+{"name": "rule2 .env main data stream is never allowed", "tool": "Read", "args": {"file_path": ".env::$DATA"}, "expect": "deny", "why": "::$DATA is the file itself; at least not allow"}
+{"name": "rule2 .env.example is a different file", "tool": "Read", "args": {"file_path": ".env.example"}, "expect": "allow", "why": "sibling with a similar name; reads_allowed"}
+{"name": "rule2 .envrc is a different file", "tool": "Read", "args": {"file_path": ".envrc"}, "expect": "allow", "why": "sibling with a similar name"}
+{"name": "rule2 src/.env is not the rule file", "tool": "Read", "args": {"file_path": "src\\.env"}, "expect": "allow", "why": "rel is from the project root"}
+{"name": "rule2 Grep tool on secrets is denied", "tool": "Grep", "args": {"pattern": "x", "path": "secrets"}, "expect": "deny", "why": "plan 2.5: Grep with path secrets Deny"}
+{"name": "rule2 Grep tool inside secrets is denied", "tool": "Grep", "args": {"pattern": "x", "path": "secrets\\sub"}, "expect": "deny", "why": "a ReadTree under the zone is denied (rules.md)"}
+{"name": "rule2 cat secrets/* is denied", "tool": "Bash", "args": {"command": "cat secrets/*"}, "expect": "deny", "why": "plan 2.5"}
+{"name": "rule2 cat a secrets file is denied", "tool": "Bash", "args": {"command": "cat secrets/key.pem"}, "expect": "deny", "why": "secrets_unreadable"}
+{"name": "rule2 rm -rf secrets is denied", "tool": "Bash", "args": {"command": "rm -rf secrets"}, "expect": "deny", "why": "secrets_protected"}
+{"name": "rule2 Write inside secrets is denied", "tool": "Write", "args": {"file_path": "secrets\\new.txt", "content": "x"}, "expect": "deny", "why": "secrets_protected"}
+{"name": "rule2 sibling secrets2 is readable", "tool": "Read", "args": {"file_path": "secrets2\\a.txt"}, "expect": "allow", "why": "not under secrets"}
+{"name": "rule2 sibling secrets.md is readable", "tool": "Read", "args": {"file_path": "secrets.md"}, "expect": "allow", "why": "not under secrets"}
+{"name": "rule2 Grep tool on the project root asks (D4)", "tool": "Grep", "args": {"pattern": "x", "path": "C:\\Users\\user\\bend2_test"}, "expect": "ask", "why": "plan 2.5: Grep on T Ask (D4)"}
+{"name": "rule2 Grep tool with no path asks (D4)", "tool": "Grep", "args": {"pattern": "x"}, "expect": "ask", "why": "searches the session folder, which contains .env"}
+{"name": "rule2 grep -r from the project root asks (D4)", "tool": "Bash", "args": {"command": "grep -r x ."}, "expect": "ask", "why": "settled: recursive searches covering .env from above ask"}
+{"name": "rule2 grep -r over home is denied (it covers the key file)", "tool": "Bash", "args": {"command": "grep -r x C:/Users/user"}, "expect": "deny", "why": "key_unreadable: any read action overlapping the key file is denied"}
+{"name": "rule2 grep -r from the parent of the project asks", "tool": "Bash", "args": {"command": "grep -r x C:/Users/user/Projects C:/Users/user/bend2_test"}, "expect": "ask", "why": "covers .env from above (D4)"}
+{"name": "rule2 Grep tool on src is allowed", "tool": "Grep", "args": {"pattern": "x", "path": "src"}, "expect": "allow", "why": "src contains no zone"}
+{"name": "rule2 grep -r then rm -rf specs is denied, not asked", "tool": "Bash", "args": {"command": "grep -r x . ; rm -rf specs"}, "expect": "deny", "why": "plan 2.5 and design 3 step 3: strictest hit wins"}
+{"name": "rule2 Grep agent on the project root is denied", "tool": "Grep", "args": {"pattern": "x", "path": "."}, "opts": {"agent": true}, "expect": "deny", "why": "D4 ask, and no person in an agent"}
+// Rule 3: NoChange build and dist
+{"name": "rule3 Edit build file is denied", "tool": "Edit", "args": {"file_path": "build\\x.js", "old_string": "a", "new_string": "b"}, "expect": "deny", "why": "plan 2.5: Edit build\\x.js Deny"}
+{"name": "rule3 Write dist file is denied", "tool": "Write", "args": {"file_path": "dist\\bundle.js", "content": "x"}, "expect": "deny", "why": "dist_protected"}
+{"name": "rule3 rm -rf dist is denied", "tool": "Bash", "args": {"command": "rm -rf dist"}, "expect": "deny", "why": "dist_protected"}
+{"name": "rule3 rm one build file is denied", "tool": "Bash", "args": {"command": "rm build/x.js"}, "expect": "deny", "why": "build_protected"}
+{"name": "rule3 build.js in the root is not the folder", "tool": "Write", "args": {"file_path": "build.js", "content": "x"}, "expect": "allow", "why": "sibling with a similar name"}
+{"name": "rule3 builder folder is not build", "tool": "Write", "args": {"file_path": "builder\\x.js", "content": "x"}, "expect": "allow", "why": "sibling with a similar name"}
+{"name": "rule3 distribution folder is not dist", "tool": "Write", "args": {"file_path": "distribution\\x.js", "content": "x"}, "expect": "allow", "why": "sibling with a similar name"}
+{"name": "rule3 src/build is not the rule folder", "tool": "Write", "args": {"file_path": "src\\build\\x.js", "content": "x"}, "expect": "allow", "why": "rel is from the project root"}
+{"name": "rule3 cat inside dist, Clef low, is allowed", "tool": "Bash", "args": {"command": "cat dist/bundle.js"}, "answer": {"risky": 0, "unsure": 0}, "expect": "allow", "why": "NoChange folders are double-check zones; low answer allows"}
+{"name": "rule3 cat inside build, no Clef answer, asks", "tool": "Bash", "args": {"command": "cat build/x.js"}, "expect": "ask", "why": "double-check zone, NoAnswer asks"}
+// Rule 5: NoForcePush
+{"name": "rule5 git push -f is denied", "tool": "Bash", "args": {"command": "git push -f"}, "expect": "deny", "why": "plan 2.5"}
+{"name": "rule5 git push --force origin feature is denied", "tool": "Bash", "args": {"command": "git push --force origin feature"}, "expect": "deny", "why": "force_push_denied"}
+{"name": "rule5 git push origin +feature is denied", "tool": "Bash", "args": {"command": "git push origin +feature"}, "expect": "deny", "why": "+ref is force"}
+{"name": "rule5 git push --mirror is denied", "tool": "Bash", "args": {"command": "git push --mirror"}, "expect": "deny", "why": "plan 2.5"}
+{"name": "rule5 git push --force-with-lease is denied", "tool": "Bash", "args": {"command": "git push --force-with-lease origin feature"}, "expect": "deny", "why": "build notes: counts as force"}
+{"name": "rule5 git push --delete is denied", "tool": "Bash", "args": {"command": "git push origin --delete feature"}, "expect": "deny", "why": "build notes: --delete counts as force"}
+{"name": "rule5 git push origin :feature is denied", "tool": "Bash", "args": {"command": "git push origin :feature"}, "expect": "deny", "why": "build notes: :dst counts as force"}
+{"name": "rule5 force push from a sub-folder is denied", "tool": "Bash", "args": {"command": "git push -f origin feature"}, "opts": {"cwds": ["C:\\Users\\user\\bend2_test\\src"]}, "expect": "deny", "why": "push run inside the project"}
+{"name": "rule5 plain push of a named branch is allowed", "tool": "Bash", "args": {"command": "git push origin feature"}, "expect": "allow", "why": "no rule hit"}
+{"name": "rule5 force push in a sibling project with a similar name is allowed", "tool": "Bash", "args": {"command": "git push -f origin feature"}, "opts": {"root": "C:\\Users\\user\\bend2_test2", "cwds": ["C:\\Users\\user\\bend2_test2"]}, "expect": "allow", "why": "push rules apply to pushes run inside the project only"}
+{"name": "rule5 force push from above the project is allowed", "tool": "Bash", "args": {"command": "git push -f origin feature"}, "opts": {"root": "C:\\Users\\user", "cwds": ["C:\\Users\\user"]}, "expect": "allow", "why": "design 3: whole-command rules apply when the command runs inside the project"}
+// Rule 6: NoPushTo main
+{"name": "rule6 git push origin main is denied", "tool": "Bash", "args": {"command": "git push origin main"}, "expect": "deny", "why": "push_main_denied"}
+{"name": "rule6 git push origin HEAD:main is denied", "tool": "Bash", "args": {"command": "git push origin HEAD:main"}, "expect": "deny", "why": "plan 2.5"}
+{"name": "rule6 git push origin refs/heads/main is denied", "tool": "Bash", "args": {"command": "git push origin refs/heads/main"}, "expect": "deny", "why": "plan 2.5"}
+{"name": "rule6 git push origin feature:main is denied", "tool": "Bash", "args": {"command": "git push origin feature:main"}, "expect": "deny", "why": "destination main"}
+{"name": "rule6 git push -u origin main is denied", "tool": "Bash", "args": {"command": "git push -u origin main"}, "expect": "deny", "why": "destination main"}
+{"name": "rule6 git push origin mainline is allowed", "tool": "Bash", "args": {"command": "git push origin mainline"}, "expect": "allow", "why": "sibling branch name"}
+{"name": "rule6 git push origin feature/main is allowed", "tool": "Bash", "args": {"command": "git push origin feature/main"}, "expect": "allow", "why": "a different branch"}
+{"name": "rule6 git push with no destination asks", "tool": "Bash", "args": {"command": "git push"}, "expect": "ask", "why": "plan 2.5: git push Ask"}
+{"name": "rule6 git push origin with no branch asks", "tool": "Bash", "args": {"command": "git push origin"}, "expect": "ask", "why": "destination not visible"}
+{"name": "rule6 git push origin HEAD asks", "tool": "Bash", "args": {"command": "git push origin HEAD"}, "expect": "ask", "why": "plan 2.5"}
+{"name": "rule6 git push -u origin @ asks", "tool": "Bash", "args": {"command": "git push -u origin @"}, "expect": "ask", "why": "plan 2.5"}
+{"name": "rule6 git push --all asks", "tool": "Bash", "args": {"command": "git push --all origin"}, "expect": "ask", "why": "plan 2.1: Ask when all"}
+{"name": "rule6 git push with no destination in an agent is denied", "tool": "Bash", "args": {"command": "git push"}, "opts": {"agent": true}, "expect": "deny", "why": "no_ask_without_person"}
+{"name": "rule6 git push origin main from above the project is allowed", "tool": "Bash", "args": {"command": "git push origin main"}, "opts": {"root": "C:\\Users\\user", "cwds": ["C:\\Users\\user"]}, "expect": "allow", "why": "push rules apply to pushes run inside the project"}
+// Rule 7: TreeDeleteOnlyUnder tmp
+{"name": "rule7 rm -rf inside tmp is allowed", "tool": "Bash", "args": {"command": "rm -rf tmp/x"}, "expect": "allow", "why": "plan 2.5"}
+{"name": "rule7 rm -rf tmp itself is allowed", "tool": "Bash", "args": {"command": "rm -rf tmp"}, "expect": "allow", "why": "tmp is not outside tmp"}
+{"name": "rule7 rm -rf ./tmp/x is allowed", "tool": "Bash", "args": {"command": "rm -rf ./tmp/x"}, "expect": "allow", "why": "same path"}
+{"name": "rule7 rm -rf TMP/x is allowed", "tool": "Bash", "args": {"command": "rm -rf TMP/x"}, "expect": "allow", "why": "case does not matter"}
+{"name": "rule7 rm -rf tmp/* asks today (rm wildcards not modelled)", "tool": "Bash", "args": {"command": "rm -rf tmp/*"}, "expect": "ask", "why": "current safe behaviour: rm wildcards are Unknown; finding rm-wildcard-tmp suggests DeleteTree tmp, which would allow"}
+{"name": "rule7 rm -rf tmp2 is denied", "tool": "Bash", "args": {"command": "rm -rf tmp2"}, "expect": "deny", "why": "sibling with a similar name is outside tmp"}
+{"name": "rule7 rm -rf tmpfiles is denied", "tool": "Bash", "args": {"command": "rm -rf tmpfiles"}, "expect": "deny", "why": "outside tmp"}
+{"name": "rule7 rm -rf src/tmp is denied", "tool": "Bash", "args": {"command": "rm -rf src/tmp"}, "expect": "deny", "why": "rel is from the project root"}
+{"name": "rule7 rm -rf tmp/../src is denied", "tool": "Bash", "args": {"command": "rm -rf tmp/../src"}, "expect": "deny", "why": "normalised path is outside tmp"}
+{"name": "rule7 rm -rf node_modules is denied", "tool": "Bash", "args": {"command": "rm -rf node_modules"}, "expect": "deny", "why": "plan 2.5"}
+{"name": "rule7 rm -r src/old is denied", "tool": "Bash", "args": {"command": "rm -r src/old"}, "expect": "deny", "why": "plan 2.5: any recursive delete, not only rm -rf"}
+{"name": "rule7 rm -R src/old is denied", "tool": "Bash", "args": {"command": "rm -R src/old"}, "expect": "deny", "why": "recursive delete"}
+{"name": "rule7 rm --recursive src/old is denied", "tool": "Bash", "args": {"command": "rm --recursive --force src/old"}, "expect": "deny", "why": "recursive delete"}
+{"name": "rule7 rm -fr src/old is denied", "tool": "Bash", "args": {"command": "rm -fr src/old"}, "expect": "deny", "why": "recursive delete"}
+{"name": "rule7 PowerShell Remove-Item -Recurse src/old is denied", "tool": "PowerShell", "args": {"command": "Remove-Item -Recurse src\\old"}, "expect": "deny", "why": "recursive delete"}
+{"name": "rule7 PowerShell Remove-Item -Recurse tmp\\x is allowed", "tool": "PowerShell", "args": {"command": "Remove-Item -Recurse tmp\\x"}, "expect": "allow", "why": "under tmp"}
+{"name": "rule7 rm of one file is allowed", "tool": "Bash", "args": {"command": "rm src/old.ts"}, "expect": "allow", "why": "plan 2.5: rm src/old.ts Allow"}
+{"name": "rule7 mv inside src is allowed", "tool": "Bash", "args": {"command": "mv src/a.ts src/b.ts"}, "expect": "allow", "why": "plan 2.5"}
+{"name": "rule7 rm -rf of an outside folder from inside the project is denied", "tool": "Bash", "args": {"command": "rm -rf C:/Users/user/other"}, "expect": "deny", "why": "build notes: applies to any recursive delete run from a folder inside the project"}
+{"name": "rule7 rm -rf of the project's parent is denied", "tool": "Bash", "args": {"command": "rm -rf C:/Users/user/scratch C:/Users/user/bend2_test/.."}, "opts": {"root": "C:\\Users\\user\\other", "cwds": ["C:\\Users\\user\\other"]}, "expect": "deny", "why": "overlaps the project (and its BEND_RULES.md)"}
+{"name": "rule7 rm -rf tmp in a sibling project is allowed", "tool": "Bash", "args": {"command": "rm -rf src"}, "opts": {"root": "C:\\Users\\user\\bend2_test2", "cwds": ["C:\\Users\\user\\bend2_test2"]}, "expect": "allow", "why": "rules are tied to their own folder; bend2_test2 is a sibling"}
+// Sessions rooted elsewhere still protect the project (design 3; cwds and opts.root)
+{"name": "elsewhere: home session cannot edit the project's specs", "tool": "Edit", "args": {"file_path": "C:\\Users\\user\\bend2_test\\specs\\a.md", "old_string": "a", "new_string": "b"}, "opts": {"root": "C:\\Users\\user", "cwds": ["C:\\Users\\user"]}, "expect": "deny", "why": "design 3: rules are tied to their project's folder"}
+{"name": "elsewhere: home session rm of a specs file is denied", "tool": "Bash", "args": {"command": "rm C:\\\\Users\\\\user\\\\bend2_test\\\\specs\\\\a.md"}, "opts": {"root": "C:\\Users\\user", "cwds": ["C:\\Users\\user"]}, "expect": "deny", "why": "plan 2.5"}
+{"name": "elsewhere: home session relative rm -rf bend2_test/specs is denied", "tool": "Bash", "args": {"command": "rm -rf bend2_test/specs"}, "opts": {"root": "C:\\Users\\user", "cwds": ["C:\\Users\\user"]}, "expect": "deny", "why": "rules tied to the folder"}
+{"name": "elsewhere: home session cat of .env is denied", "tool": "Bash", "args": {"command": "cat bend2_test/.env"}, "opts": {"root": "C:\\Users\\user", "cwds": ["C:\\Users\\user"]}, "expect": "deny", "why": "rules tied to the folder"}
+{"name": "elsewhere: home session rm -rf of project src is denied", "tool": "Bash", "args": {"command": "rm -rf bend2_test/src"}, "opts": {"root": "C:\\Users\\user", "cwds": ["C:\\Users\\user"]}, "expect": "deny", "why": "build notes: TreeDeleteOnlyUnder applies to a recursive delete that overlaps the project"}
+{"name": "elsewhere: home session rm -rf of project tmp is allowed", "tool": "Bash", "args": {"command": "rm -rf bend2_test/tmp/x"}, "opts": {"root": "C:\\Users\\user", "cwds": ["C:\\Users\\user"]}, "expect": "allow", "why": "under tmp"}
+{"name": "elsewhere: home session pushing from inside the project is denied", "tool": "Bash", "args": {"command": "git push -f"}, "opts": {"root": "C:\\Users\\user", "cwds": ["C:\\Users\\user\\bend2_test"]}, "expect": "deny", "why": "the push runs inside the project"}
+{"name": "elsewhere: sub-folder session rm ..\\specs\\a.md is denied", "tool": "Bash", "args": {"command": "rm ../specs/a.md"}, "opts": {"root": "C:\\Users\\user\\bend2_test\\src", "cwds": ["C:\\Users\\user\\bend2_test\\src"]}, "expect": "deny", "why": "plan 2.5"}
+{"name": "elsewhere: sub-folder session Edit ..\\.env is denied", "tool": "Edit", "args": {"file_path": "..\\.env", "old_string": "a", "new_string": "b"}, "opts": {"root": "C:\\Users\\user\\bend2_test\\src", "cwds": ["C:\\Users\\user\\bend2_test\\src"]}, "expect": "deny", "why": "relative path read from the session root"}
+{"name": "elsewhere: sub-folder session rm -rf ../lib is denied", "tool": "Bash", "args": {"command": "rm -rf ../lib"}, "opts": {"root": "C:\\Users\\user\\bend2_test\\src", "cwds": ["C:\\Users\\user\\bend2_test\\src"]}, "expect": "deny", "why": "recursive delete outside tmp"}
+{"name": "elsewhere: sub-folder session rm -rf ../tmp/x is allowed", "tool": "Bash", "args": {"command": "rm -rf ../tmp/x"}, "opts": {"root": "C:\\Users\\user\\bend2_test\\src", "cwds": ["C:\\Users\\user\\bend2_test\\src"]}, "expect": "allow", "why": "under tmp"}
+{"name": "elsewhere: sibling project's specs are not this project's", "tool": "Edit", "args": {"file_path": "C:\\Users\\user\\bend2_test2\\specs\\a.md", "old_string": "a", "new_string": "b"}, "opts": {"root": "C:\\Users\\user\\bend2_test2", "cwds": ["C:\\Users\\user\\bend2_test2"]}, "expect": "allow", "why": "rules tied to bend2_test only"}
+{"name": "elsewhere: second possible folder in specs denies a relative rm", "tool": "Bash", "args": {"command": "rm notes.md"}, "opts": {"root": "C:\\Users\\user", "cwds": ["C:\\Users\\user", "C:\\Users\\user\\bend2_test\\specs"]}, "expect": "deny", "why": "every possible shell folder is checked"}
+// More boundaries (policy tester, round 2): the folder itself, renames, streams, short names, push refspecs.
+{"name": "rule3 touch build (the folder itself) is denied", "tool": "Bash", "args": {"command": "touch build"}, "expect": "deny", "why": "NoChange hits the folder itself"}
+{"name": "rule3 mkdir dist (the folder itself) is denied", "tool": "Bash", "args": {"command": "mkdir dist"}, "expect": "deny", "why": "NoChange hits the folder itself"}
+{"name": "rule3 mv dist dist.old is denied", "tool": "Bash", "args": {"command": "mv dist dist.old"}, "expect": "deny", "why": "plan 2.1: a MoveFrom counts as a change of its whole tree"}
+{"name": "rule3 cp -r src build is denied", "tool": "Bash", "args": {"command": "cp -r src build"}, "expect": "deny", "why": "a WriteTree under build"}
+{"name": "rule3 sibling dist2 is not protected", "tool": "Write", "args": {"file_path": "dist2\\a.js", "content": "x"}, "expect": "allow", "why": "not under dist"}
+{"name": "rule2 mv .env .env.bak is denied", "tool": "Bash", "args": {"command": "mv .env .env.bak"}, "expect": "deny", "why": "a MoveFrom changes .env"}
+{"name": "rule2 cp .env into tmp is denied", "tool": "Bash", "args": {"command": "cp .env tmp/e"}, "expect": "deny", "why": "cp reads .env"}
+{"name": "rule2 head -n 1 .env is denied", "tool": "Bash", "args": {"command": "head -n 1 .env"}, "expect": "deny", "why": "a Read under .env"}
+{"name": "rule2 cat .env:stream is denied", "tool": "Bash", "args": {"command": "cat .env:stream"}, "expect": "deny", "why": "design 2: a stream suffix counts as the file"}
+{"name": "rule2 Read .env::$DATA is denied", "tool": "Read", "args": {"file_path": ".env::$DATA"}, "expect": "deny", "why": "stream spelling of .env"}
+{"name": "rule2 Read a secrets file with a stream suffix is denied", "tool": "Read", "args": {"file_path": "secrets\\a.txt:x"}, "expect": "deny", "why": "stream spelling"}
+{"name": "rule2 grep -r . from inside secrets is denied", "tool": "Bash", "args": {"command": "grep -r x ."}, "opts": {"cwds": ["C:\\Users\\user\\bend2_test\\secrets"]}, "expect": "deny", "why": "a ReadTree under secrets"}
+{"name": "rule2 ls secrets (names only) is allowed", "tool": "Bash", "args": {"command": "ls secrets"}, "expect": "allow", "why": "plan 2.1 rule_verdict: NoReadOrChange denies Read or ReadTree; a listing prints names, not contents"}
+{"name": "rule2 git show HEAD:.env is denied", "tool": "Bash", "args": {"command": "git show HEAD:.env"}, "expect": "deny", "why": "round 3 (P1): git show <rev>:<path> is understood as a read of .env, so rule 2 refuses it"}
+{"name": "rule1 8.3 short name SPECS~1 asks", "tool": "Bash", "args": {"command": "rm SPECS~1/a.md"}, "expect": "ask", "why": "design 2: 8.3 short names give unknown"}
+{"name": "rule1 mv of the whole project from home is denied", "tool": "Bash", "args": {"command": "mv bend2_test old_test"}, "opts": {"root": "C:\\Users\\user", "cwds": ["C:\\Users\\user"]}, "expect": "deny", "why": "above the folder: a MoveFrom of a tree that contains specs"}
+{"name": "rule7 rm -rf . from inside tmp is allowed", "tool": "Bash", "args": {"command": "rm -rf ."}, "opts": {"cwds": ["C:\\Users\\user\\bend2_test\\tmp"]}, "expect": "allow", "why": "the delete is tmp itself"}
+{"name": "rule7 rm -rf tmp/.. is denied", "tool": "Bash", "args": {"command": "rm -rf tmp/.."}, "expect": "deny", "why": "resolves to the project folder"}
+{"name": "rule7 rm -rf tmp. (trailing dot) is tmp, allowed", "tool": "Bash", "args": {"command": "rm -rf tmp."}, "expect": "allow", "why": "design 2: trailing dots are dropped"}
+{"name": "rule5 git push origin +main is denied", "tool": "Bash", "args": {"command": "git push origin +main"}, "expect": "deny", "why": "+refspec is a force push"}
+{"name": "rule6 git push origin HEAD:refs/heads/main is denied", "tool": "Bash", "args": {"command": "git push origin HEAD:refs/heads/main"}, "expect": "deny", "why": "destination main written out"}
+{"name": "rule6 git push origin feature main is denied", "tool": "Bash", "args": {"command": "git push origin feature main"}, "expect": "deny", "why": "one of the destinations is main"}
+{"name": "rule6 git push origin main:feature is allowed", "tool": "Bash", "args": {"command": "git push origin main:feature"}, "expect": "allow", "why": "the destination is feature, not main"}
+{"name": "rule6 git push --tags asks", "tool": "Bash", "args": {"command": "git push --tags"}, "expect": "ask", "why": "no destination it can see"}
+{"name": "rule6 git push origin v1.0 is allowed", "tool": "Bash", "args": {"command": "git push origin v1.0"}, "expect": "allow", "why": "not main"}
+{"name":"rule1 cp -r tmp/specs . replaces specs","tool":"Bash","args":{"command":"cp -r tmp/specs ."},"expect":"deny","why":"WriteTree{./specs} changes specs (rule 1)"}

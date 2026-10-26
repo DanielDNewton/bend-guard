@@ -1,0 +1,5 @@
+{
+  "name": "bend-guard",
+  "version": "0.1.0",
+  "description": "Checks every tool call in projects with an approved BEND_RULES.md against Bend 2 rules with machine-checked laws; Clef on OpenRouter can only make answers stricter."
+}

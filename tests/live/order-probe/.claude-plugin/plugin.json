@@ -1,0 +1,5 @@
+{
+  "name": "bend-guard-order-probe",
+  "version": "0.0.1",
+  "description": "Test-only: records the order in which the engine fires tool.call and tool.check."
+}

@@ -1,0 +1,113 @@
+[
+  {
+    "line": 1,
+    "text": "Never delete or edit files in `specs/`. They are signed off by the client; changes go through a pull request written by a person.",
+    "kind": "hard",
+    "reason": "Names a folder and forbids changing it: no write, edit or delete under specs.",
+    "rules": [{ "kind": "NoChange", "rel": "specs" }]
+  },
+  {
+    "line": 2,
+    "text": "Never edit `.env` or anything in `secrets/`, and never print their contents.",
+    "kind": "hard",
+    "reason": "Names two paths and forbids both changing and reading them.",
+    "rules": [
+      { "kind": "NoReadOrChange", "rel": ".env" },
+      { "kind": "NoReadOrChange", "rel": "secrets" }
+    ]
+  },
+  {
+    "line": 3,
+    "text": "Never edit generated files in `build/` or `dist/`; change the source and rebuild.",
+    "kind": "hard",
+    "reason": "Names two folders and forbids changing them.",
+    "rules": [
+      { "kind": "NoChange", "rel": "build" },
+      { "kind": "NoChange", "rel": "dist" }
+    ]
+  },
+  {
+    "line": 4,
+    "text": "Don't create new top-level folders without asking first.",
+    "kind": "ask",
+    "reason": "Allowed after asking: the ask hook asks the user before a new top-level folder is made.",
+    "rules": []
+  },
+  {
+    "line": 5,
+    "text": "Never run `git push --force` or `git push -f`.",
+    "kind": "hard",
+    "reason": "Forbids a command: any forced push (--force, -f, +ref, --mirror) in this project.",
+    "rules": [{ "kind": "NoForcePush" }]
+  },
+  {
+    "line": 6,
+    "text": "Never push directly to `main`; work on a branch.",
+    "kind": "hard",
+    "reason": "Forbids a command: a push that names main; a push whose destination is not visible is asked.",
+    "rules": [{ "kind": "NoPushTo", "branch": "main" }]
+  },
+  {
+    "line": 7,
+    "text": "Never run `rm -rf` on anything outside `tmp/`.",
+    "kind": "hard",
+    "reason": "Forbids recursive deletes outside tmp; read as any recursive delete, not only the spelling rm -rf.",
+    "rules": [{ "kind": "TreeDeleteOnlyUnder", "rel": "tmp" }]
+  },
+  {
+    "line": 8,
+    "text": "Don't install new npm packages without asking first.",
+    "kind": "ask",
+    "reason": "Allowed after asking: every npm install is asked about.",
+    "rules": []
+  },
+  {
+    "line": 9,
+    "text": "Run `npm test` before saying a task is done, and show that it passed.",
+    "kind": "ask",
+    "reason": "A finish rule: a reminder at the end of the turn to run npm test.",
+    "rules": []
+  },
+  {
+    "line": 10,
+    "text": "Run `npm run lint` and fix any errors before finishing.",
+    "kind": "ask",
+    "reason": "A finish rule: a reminder at the end of the turn to run npm run lint.",
+    "rules": []
+  },
+  {
+    "line": 11,
+    "text": "Match the existing code style; don't reformat files you aren't otherwise changing.",
+    "kind": "judgment",
+    "reason": "Needs taste; it stays in CLAUDE.md.",
+    "rules": []
+  },
+  {
+    "line": 12,
+    "text": "Ask before any refactor that touches more than three files.",
+    "kind": "judgment",
+    "reason": "Whether a change is a refactor needs judgment; it stays in CLAUDE.md.",
+    "rules": []
+  },
+  {
+    "line": 13,
+    "text": "Keep commit messages under 72 characters on the first line.",
+    "kind": "judgment",
+    "reason": "About message style, not paths or commands bend-guard models; it stays in CLAUDE.md.",
+    "rules": []
+  },
+  {
+    "line": 14,
+    "text": "Prefer editing an existing file to creating a new one.",
+    "kind": "judgment",
+    "reason": "A preference, not a hard rule; it stays in CLAUDE.md.",
+    "rules": []
+  },
+  {
+    "line": 15,
+    "text": "Don't add comments that only restate what the code does.",
+    "kind": "judgment",
+    "reason": "Needs taste; it stays in CLAUDE.md.",
+    "rules": []
+  }
+]

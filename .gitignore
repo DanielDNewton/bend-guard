@@ -1,0 +1,22 @@
+# Scratch builds made by tests/lib/build.mjs (tests/.build, tests/.build-docs, ...)
+tests/.build/
+tests/.build-docs/
+tests/.build*/
+
+# Dependencies and logs
+node_modules/
+*.log
+npm-debug.log*
+
+# Local secrets and state never belong in the repository
+*.key
+.env
+
+# Editor and OS clutter
+.vscode/
+.idea/
+*.swp
+*~
+.DS_Store
+Thumbs.db
+desktop.ini

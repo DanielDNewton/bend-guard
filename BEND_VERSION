@@ -1,0 +1,4 @@
+version: 2.0.39
+tarball-sha256 (linux-x64): 6cf462fd8f70b094a4950ebb709a9c4ffd8f1d1189d9cedf1fd63cd5d041c7ab
+binary-sha256 (/opt/bend-2.0.39/bin/bend): 2ec160fa4486d33aff51e9eedcc294d6b531dc10c279c00b0c00685dae2045cd
+tag v2.0.39 commit: a3efe8a3801f423827424227172eed9802c5e6cb

@@ -1,0 +1,114 @@
+// Everyday commands a coding agent runs, with the verdict the policy gives today (2026-10-26).
+// expect is the MEASURED verdict, not the wanted one: when a NOISE case is fixed, update its expect to allow.
+// why: NOISE = unknown today (asks in the main session, refused in agents, in log-only mode too); D3/D4/rule 7 = by design.
+{"name":"noise bash: git status","tool":"Bash","args":{"command":"git status"},"expect":"allow","why":"known: allowed"}
+{"name":"noise bash: git status --short","tool":"Bash","args":{"command":"git status --short"},"expect":"allow","why":"known: allowed"}
+{"name":"noise bash: git status -sb","tool":"Bash","args":{"command":"git status -sb"},"expect":"allow","why":"round 2 (P8 git): now understood and allowed"}
+{"name":"noise bash: git status --porcelain","tool":"Bash","args":{"command":"git status --porcelain"},"expect":"allow","why":"round 2 (P8 git): now understood and allowed"}
+{"name":"noise bash: git diff","tool":"Bash","args":{"command":"git diff"},"expect":"allow","why":"known: allowed"}
+{"name":"noise bash: git diff --stat","tool":"Bash","args":{"command":"git diff --stat"},"expect":"allow","why":"known: allowed"}
+{"name":"noise bash: git diff HEAD","tool":"Bash","args":{"command":"git diff HEAD"},"expect":"allow","why":"known: allowed"}
+{"name":"noise bash: git diff src/app.ts","tool":"Bash","args":{"command":"git diff src/app.ts"},"expect":"allow","why":"known: allowed"}
+{"name":"noise bash: git log --oneline -10","tool":"Bash","args":{"command":"git log --oneline -10"},"expect":"allow","why":"known: allowed"}
+{"name":"noise bash: git log -n 5 --oneline","tool":"Bash","args":{"command":"git log -n 5 --oneline"},"expect":"allow","why":"known: allowed"}
+{"name":"noise bash: git log --oneline --graph","tool":"Bash","args":{"command":"git log --oneline --graph"},"expect":"allow","why":"round 2 (P8 git): now understood and allowed"}
+{"name":"noise bash: git log -p -1","tool":"Bash","args":{"command":"git log -p -1"},"expect":"allow","why":"round 2 (P8 git): now understood and allowed"}
+{"name":"noise bash: git show HEAD","tool":"Bash","args":{"command":"git show HEAD"},"expect":"allow","why":"round 2 (P8 git): now understood and allowed"}
+{"name":"noise bash: git branch","tool":"Bash","args":{"command":"git branch"},"expect":"allow","why":"round 2 (P8 git): now understood and allowed"}
+{"name":"noise bash: git branch -a","tool":"Bash","args":{"command":"git branch -a"},"expect":"allow","why":"round 2 (P8 git): now understood and allowed"}
+{"name":"noise bash: git add .","tool":"Bash","args":{"command":"git add ."},"expect":"ask","why":"NOISE: git add not modelled"}
+{"name":"noise bash: git add src/app.ts","tool":"Bash","args":{"command":"git add src/app.ts"},"expect":"allow","why":"round 2 (P8 git): now understood and allowed"}
+{"name":"noise bash: git commit -m \"Fix bug\"","tool":"Bash","args":{"command":"git commit -m \"Fix bug\""},"expect":"ask","why":"NOISE: git commit not modelled"}
+{"name":"noise bash: git checkout -b feature/x","tool":"Bash","args":{"command":"git checkout -b feature/x"},"expect":"allow","why":"known: allowed"}
+{"name":"noise bash: git push -u origin feature/x","tool":"Bash","args":{"command":"git push -u origin feature/x"},"expect":"allow","why":"known: allowed"}
+{"name":"noise bash: git fetch","tool":"Bash","args":{"command":"git fetch"},"expect":"allow","why":"round 2 (P8 git): now understood and allowed"}
+{"name":"noise bash: git pull","tool":"Bash","args":{"command":"git pull"},"expect":"ask","why":"NOISE: git pull not modelled"}
+{"name":"noise bash: git rev-parse HEAD","tool":"Bash","args":{"command":"git rev-parse HEAD"},"expect":"allow","why":"round 2 (P8 git): now understood and allowed"}
+{"name":"noise bash: npm run build","tool":"Bash","args":{"command":"npm run build"},"expect":"ask","why":"D3: RunScript asks (no TrustScript rule)"}
+{"name":"noise bash: npm test","tool":"Bash","args":{"command":"npm test"},"expect":"ask","why":"D3: RunScript asks"}
+{"name":"noise bash: npm run lint","tool":"Bash","args":{"command":"npm run lint"},"expect":"ask","why":"D3: RunScript asks"}
+{"name":"noise bash: npm install","tool":"Bash","args":{"command":"npm install"},"expect":"ask","why":"D3: NpmInstall asks"}
+{"name":"noise bash: npx tsc --noEmit","tool":"Bash","args":{"command":"npx tsc --noEmit"},"expect":"ask","why":"NOISE: npx runs other code"}
+{"name":"noise bash: npx vitest run","tool":"Bash","args":{"command":"npx vitest run"},"expect":"ask","why":"NOISE: npx runs other code"}
+{"name":"noise bash: tsc --noEmit","tool":"Bash","args":{"command":"tsc --noEmit"},"expect":"ask","why":"NOISE: tsc not modelled"}
+{"name":"noise bash: node script.js","tool":"Bash","args":{"command":"node script.js"},"expect":"ask","why":"NOISE: node runs other code"}
+{"name":"noise bash: node --version","tool":"Bash","args":{"command":"node --version"},"expect":"allow","why":"round 2 (P7/P9): now modelled as a read, a listing or a command with no file effect"}
+{"name":"noise bash: python -m pytest","tool":"Bash","args":{"command":"python -m pytest"},"expect":"ask","why":"NOISE: python runs other code"}
+{"name":"noise bash: python3 script.py","tool":"Bash","args":{"command":"python3 script.py"},"expect":"ask","why":"NOISE: python3 runs other code"}
+{"name":"noise bash: pytest -q","tool":"Bash","args":{"command":"pytest -q"},"expect":"ask","why":"NOISE: pytest not modelled"}
+{"name":"noise bash: ls -la","tool":"Bash","args":{"command":"ls -la"},"expect":"allow","why":"known: allowed"}
+{"name":"noise bash: ls src","tool":"Bash","args":{"command":"ls src"},"expect":"allow","why":"known: allowed"}
+{"name":"noise bash: cat package.json","tool":"Bash","args":{"command":"cat package.json"},"expect":"allow","why":"known: allowed"}
+{"name":"noise bash: head -n 20 src/app.ts","tool":"Bash","args":{"command":"head -n 20 src/app.ts"},"expect":"allow","why":"known: allowed"}
+{"name":"noise bash: tail -n 50 log.txt","tool":"Bash","args":{"command":"tail -n 50 log.txt"},"expect":"allow","why":"known: allowed"}
+{"name":"noise bash: tail -f log.txt","tool":"Bash","args":{"command":"tail -f log.txt"},"expect":"allow","why":"round 2 (P7/P9): now modelled as a read, a listing or a command with no file effect"}
+{"name":"noise bash: cat -n src/app.ts","tool":"Bash","args":{"command":"cat -n src/app.ts"},"expect":"allow","why":"round 2 (P7/P9): now modelled as a read, a listing or a command with no file effect"}
+{"name":"noise bash: wc -l src/app.ts","tool":"Bash","args":{"command":"wc -l src/app.ts"},"expect":"allow","why":"round 2 (P7/P9): now modelled as a read, a listing or a command with no file effect"}
+{"name":"noise bash: grep -rn TODO src","tool":"Bash","args":{"command":"grep -rn TODO src"},"expect":"allow","why":"known: allowed"}
+{"name":"noise bash: grep -rn \"foo.*bar\" src","tool":"Bash","args":{"command":"grep -rn \"foo.*bar\" src"},"expect":"allow","why":"P10: a quoted pattern is never expanded by bash, so it reads only src (was: a wildcard in the pattern added ReadTree of the current folder)","meaning":"Known[ReadTree c:/users/user/bend2_test/src]"}
+{"name":"noise bash: grep -rn TODO .","tool":"Bash","args":{"command":"grep -rn TODO ."},"expect":"ask","why":"D4: a tree search over .env asks (by design)"}
+{"name":"noise bash: grep -A 3 foo src/app.ts","tool":"Bash","args":{"command":"grep -A 3 foo src/app.ts"},"expect":"allow","why":"round 2 (P7/P9): now modelled as a read, a listing or a command with no file effect"}
+{"name":"noise bash: find . -name \"*.ts\"","tool":"Bash","args":{"command":"find . -name \"*.ts\""},"expect":"allow","why":"round 2 (P7/P9): now modelled as a read, a listing or a command with no file effect"}
+{"name":"noise bash: find src -type f","tool":"Bash","args":{"command":"find src -type f"},"expect":"allow","why":"round 2 (P7/P9): now modelled as a read, a listing or a command with no file effect"}
+{"name":"noise bash: mkdir -p src/utils","tool":"Bash","args":{"command":"mkdir -p src/utils"},"expect":"allow","why":"known: allowed"}
+{"name":"noise bash: cp src/a.ts src/b.ts","tool":"Bash","args":{"command":"cp src/a.ts src/b.ts"},"expect":"allow","why":"known: allowed"}
+{"name":"noise bash: cp ../shared/config.json .","tool":"Bash","args":{"command":"cp ../shared/config.json ."},"expect":"allow","why":"a target of . always exists, so the folder itself is not written: only WriteTree{./config.json} (design component 4)"}
+{"name":"noise bash: mv src/old.ts src/new.ts","tool":"Bash","args":{"command":"mv src/old.ts src/new.ts"},"expect":"allow","why":"known: allowed"}
+{"name":"noise bash: rm src/old.ts","tool":"Bash","args":{"command":"rm src/old.ts"},"expect":"allow","why":"known: allowed"}
+{"name":"noise bash: rm -rf node_modules","tool":"Bash","args":{"command":"rm -rf node_modules"},"expect":"deny","why":"rule 7: recursive delete outside tmp (the project rule itself)"}
+{"name":"noise bash: rm -rf dist","tool":"Bash","args":{"command":"rm -rf dist"},"expect":"deny","why":"rule 7"}
+{"name":"noise bash: echo \"hello\" > notes.txt","tool":"Bash","args":{"command":"echo \"hello\" > notes.txt"},"expect":"allow","why":"known: allowed"}
+{"name":"noise bash: touch src/new.ts","tool":"Bash","args":{"command":"touch src/new.ts"},"expect":"allow","why":"known: allowed"}
+{"name":"noise bash: pwd","tool":"Bash","args":{"command":"pwd"},"expect":"allow","why":"known: allowed"}
+{"name":"noise bash: sed -n 1,20p src/app.ts","tool":"Bash","args":{"command":"sed -n 1,20p src/app.ts"},"expect":"allow","why":"round 2 (P7/P9): now modelled as a read, a listing or a command with no file effect"}
+{"name":"noise bash: sort data.txt | uniq","tool":"Bash","args":{"command":"sort data.txt | uniq"},"expect":"allow","why":"round 2 (P7/P9): now modelled as a read, a listing or a command with no file effect"}
+{"name":"noise bash: sort data.txt | uniq -c","tool":"Bash","args":{"command":"sort data.txt | uniq -c"},"expect":"allow","why":"round 2 (P7/P9): now modelled as a read, a listing or a command with no file effect"}
+{"name":"noise bash: jq .version package.json","tool":"Bash","args":{"command":"jq .version package.json"},"expect":"allow","why":"round 2 (P7/P9): now modelled as a read, a listing or a command with no file effect"}
+{"name":"noise bash: curl -s https://example.com","tool":"Bash","args":{"command":"curl -s https://example.com"},"expect":"allow","why":"round 3 (P4): curl GET is now understood and allowed"}
+{"name":"noise bash: which node","tool":"Bash","args":{"command":"which node"},"expect":"allow","why":"round 2 (P7/P9): now modelled as a read, a listing or a command with no file effect"}
+{"name":"noise bash: diff a.txt b.txt","tool":"Bash","args":{"command":"diff a.txt b.txt"},"expect":"allow","why":"round 2 (P7/P9): now modelled as a read, a listing or a command with no file effect"}
+{"name":"noise bash: tree src","tool":"Bash","args":{"command":"tree src"},"expect":"allow","why":"round 2 (P7/P9): now modelled as a read, a listing or a command with no file effect"}
+{"name":"noise bash: cat src/app.ts | head -20","tool":"Bash","args":{"command":"cat src/app.ts | head -20"},"expect":"allow","why":"known: allowed"}
+{"name":"noise bash: ls -la | grep ts","tool":"Bash","args":{"command":"ls -la | grep ts"},"expect":"allow","why":"known: allowed"}
+{"name":"noise bash: echo $PATH","tool":"Bash","args":{"command":"echo $PATH"},"expect":"ask","why":"NOISE: variables are unknown (by design)"}
+{"name":"noise bash: export FOO=1","tool":"Bash","args":{"command":"export FOO=1"},"expect":"ask","why":"NOISE: export not modelled"}
+{"name":"noise bash: cd src && npm test","tool":"Bash","args":{"command":"cd src && npm test"},"expect":"ask","why":"D3: RunScript asks"}
+{"name":"noise pwsh: Get-ChildItem","tool":"PowerShell","args":{"command":"Get-ChildItem"},"expect":"allow","why":"known: allowed"}
+{"name":"noise pwsh: Get-ChildItem -Recurse -Filter *.ts","tool":"PowerShell","args":{"command":"Get-ChildItem -Recurse -Filter *.ts"},"expect":"allow","why":"round 2 (P11 PowerShell): now understood and allowed"}
+{"name":"noise pwsh: Get-Content package.json","tool":"PowerShell","args":{"command":"Get-Content package.json"},"expect":"allow","why":"known: allowed"}
+{"name":"noise pwsh: Get-Content src\\app.ts -TotalCount 20","tool":"PowerShell","args":{"command":"Get-Content src\\app.ts -TotalCount 20"},"expect":"allow","why":"known: allowed"}
+{"name":"noise pwsh: Get-Content log.txt -Tail 50","tool":"PowerShell","args":{"command":"Get-Content log.txt -Tail 50"},"expect":"allow","why":"known: allowed"}
+{"name":"noise pwsh: Select-String -Path src\\*.ts -Pattern TODO","tool":"PowerShell","args":{"command":"Select-String -Path src\\*.ts -Pattern TODO"},"expect":"allow","why":"round 2 (P11 PowerShell): now understood and allowed"}
+{"name":"noise pwsh: Test-Path src","tool":"PowerShell","args":{"command":"Test-Path src"},"expect":"allow","why":"round 2 (P11 PowerShell): now understood and allowed"}
+{"name":"noise pwsh: New-Item -ItemType Directory -Force src\\utils","tool":"PowerShell","args":{"command":"New-Item -ItemType Directory -Force src\\utils"},"expect":"allow","why":"round 2 (P11 PowerShell): now understood and allowed"}
+{"name":"noise pwsh: Copy-Item src\\a.ts src\\b.ts","tool":"PowerShell","args":{"command":"Copy-Item src\\a.ts src\\b.ts"},"expect":"allow","why":"round 2 (P11 PowerShell): now understood and allowed"}
+{"name":"noise pwsh: Move-Item src\\old.ts src\\new.ts","tool":"PowerShell","args":{"command":"Move-Item src\\old.ts src\\new.ts"},"expect":"allow","why":"round 2 (P11 PowerShell): now understood and allowed"}
+{"name":"noise pwsh: Remove-Item src\\old.ts","tool":"PowerShell","args":{"command":"Remove-Item src\\old.ts"},"expect":"allow","why":"known: allowed"}
+{"name":"noise pwsh: Set-Content notes.txt \"hello\"","tool":"PowerShell","args":{"command":"Set-Content notes.txt \"hello\""},"expect":"allow","why":"known: allowed"}
+{"name":"noise pwsh: git status","tool":"PowerShell","args":{"command":"git status"},"expect":"allow","why":"known: allowed"}
+{"name":"noise pwsh: npm run build","tool":"PowerShell","args":{"command":"npm run build"},"expect":"ask","why":"D3"}
+{"name":"noise pwsh: Get-Location","tool":"PowerShell","args":{"command":"Get-Location"},"expect":"allow","why":"round 2 (P11 PowerShell): now understood and allowed"}
+{"name":"noise pwsh: Write-Output hello","tool":"PowerShell","args":{"command":"Write-Output hello"},"expect":"allow","why":"round 2 (P11 PowerShell): now understood and allowed"}
+{"name":"noise pwsh: Get-Process node","tool":"PowerShell","args":{"command":"Get-Process node"},"expect":"allow","why":"round 2 (P11 PowerShell): now understood and allowed"}
+{"name":"noise pwsh: Get-Content src\\app.ts | Measure-Object -Line","tool":"PowerShell","args":{"command":"Get-Content src\\app.ts | Measure-Object -Line"},"expect":"allow","why":"round 2 (P11 PowerShell): now understood and allowed"}
+{"name":"noise pwsh: Get-Content a.txt | Select-Object -First 5","tool":"PowerShell","args":{"command":"Get-Content a.txt | Select-Object -First 5"},"expect":"allow","why":"round 2 (P11 PowerShell): now understood and allowed"}
+{"name":"noise pwsh: Get-Item srcapp.ts","tool":"PowerShell","args":{"command":"Get-Item srcapp.ts"},"expect":"allow","why":"round 2 (P11 PowerShell): now understood and allowed"}
+{"name":"noise pwsh: Resolve-Path src","tool":"PowerShell","args":{"command":"Resolve-Path src"},"expect":"allow","why":"round 2 (P11 PowerShell): now understood and allowed"}
+{"name":"noise pwsh: Get-Command node","tool":"PowerShell","args":{"command":"Get-Command node"},"expect":"allow","why":"round 2 (P11 PowerShell): now understood and allowed"}
+{"name":"noise pwsh: Add-Content log.txt \"line\"","tool":"PowerShell","args":{"command":"Add-Content log.txt \"line\""},"expect":"allow","why":"round 2 (P11 PowerShell): now understood and allowed"}
+{"name":"noise pwsh: Get-Content srcapp.ts | Select-String TODO","tool":"PowerShell","args":{"command":"Get-Content srcapp.ts | Select-String TODO"},"expect":"allow","why":"round 2 (P11 PowerShell): now understood and allowed"}
+{"name":"noise pwsh: \"hello\" | Out-File notes.txt","tool":"PowerShell","args":{"command":"\"hello\" | Out-File notes.txt"},"expect":"ask","why":"NOISE: a quoted string as a pipeline start is refused by the lexer; Out-File not modelled"}
+{"name":"noise pwsh: cd src; ls","tool":"PowerShell","args":{"command":"cd src; ls"},"expect":"allow","why":"known: allowed"}
+{"name":"noise pwsh: dir","tool":"PowerShell","args":{"command":"dir"},"expect":"allow","why":"known: allowed"}
+{"name":"noise bash: git remote -v","tool":"Bash","args":{"command":"git remote -v"},"expect":"allow","why":"round 2 (P8 git): now understood and allowed"}
+{"name":"noise bash: git stash list","tool":"Bash","args":{"command":"git stash list"},"expect":"allow","why":"round 2 (P8 git): now understood and allowed"}
+{"name":"noise bash: npm ci","tool":"Bash","args":{"command":"npm ci"},"expect":"ask","why":"D3: NpmInstall asks"}
+{"name":"noise bash: npm ls","tool":"Bash","args":{"command":"npm ls"},"expect":"allow","why":"round 2 (P7/P9): now modelled as a read, a listing or a command with no file effect"}
+{"name":"noise bash: ls | wc -l","tool":"Bash","args":{"command":"ls | wc -l"},"expect":"allow","why":"round 2 (P7/P9): now modelled as a read, a listing or a command with no file effect"}
+{"name":"noise bash: du -sh src","tool":"Bash","args":{"command":"du -sh src"},"expect":"allow","why":"round 2 (P7/P9): now modelled as a read, a listing or a command with no file effect"}
+{"name":"noise bash: realpath src","tool":"Bash","args":{"command":"realpath src"},"expect":"allow","why":"round 2 (P7/P9): now modelled as a read, a listing or a command with no file effect"}
+{"name":"noise bash: cat <<EOF\nhi\nEOF","tool":"Bash","args":{"command":"cat <<EOF\nhi\nEOF"},"expect":"allow","why":"P10: a heredoc with a bare end word and no $ ` \\ in its body is standard input (was: here-documents are refused by the lexer)"}
+{"name":"noise bash: printf \"a\n\" > x.txt","tool":"Bash","args":{"command":"printf \"a\n\" > x.txt"},"expect":"allow","why":"known: allowed"}
+{"name":"noise bash: echo hi >> log.txt","tool":"Bash","args":{"command":"echo hi >> log.txt"},"expect":"allow","why":"known: allowed"}
+{"name":"noise bash: git log --oneline | head -5","tool":"Bash","args":{"command":"git log --oneline | head -5"},"expect":"allow","why":"known: allowed"}
+{"name":"noise bash: git diff --name-only","tool":"Bash","args":{"command":"git diff --name-only"},"expect":"allow","why":"known: allowed"}

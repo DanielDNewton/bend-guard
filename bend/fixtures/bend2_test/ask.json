@@ -1,0 +1,6 @@
+{
+  "newTopLevelDir": true,
+  "npmInstall": true,
+  "testBeforeDone": "npm test",
+  "lintBeforeDone": "npm run lint"
+}

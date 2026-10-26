@@ -1,0 +1,6 @@
+// Smoke cases written with the harness; the test agents add the real corpus.
+{"name": "rm -rf specs is denied", "tool": "Bash", "args": {"command": "rm -rf specs"}, "expect": "deny", "meaning": "DeleteTree c:/users/user/bend2_test/specs", "why": "rule 1 NoChange specs"}
+{"name": "cat README.md is allowed", "tool": "Bash", "args": {"command": "cat README.md"}, "expect": "allow", "why": "reads_allowed"}
+{"name":"unknown flag asks in the main session","tool":"Bash","args":{"command":"rm --one-file-system x"},"expect":"ask","why":"unknown never allowed; a person can be asked (round 2: ls accepts every flag, so the example is an rm flag)"}
+{"name":"unknown flag is denied in an agent","tool":"Bash","args":{"command":"rm --one-file-system x"},"opts":{"agent":true},"expect":"deny","why":"no_ask_without_person (round 2: ls accepts every flag, so the example is an rm flag)"}
+{"name": "log-only lets rule 1 through", "tool": "Bash", "args": {"command": "rm -rf specs"}, "opts": {"logOnly": true}, "expect": "allow", "why": "project rules are logged only in log-only mode"}

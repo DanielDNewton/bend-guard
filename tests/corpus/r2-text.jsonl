@@ -1,0 +1,166 @@
+// Round 2, backlog items P7 (text filters, harmless commands, wrappers, read-only flags) and P9 (sed, awk and find without their write and run forms).
+{"name":"r2 text: cut -c1-200 src/app.ts","tool":"Bash","args":{"command":"cut -c1-200 src/app.ts"},"expect":"allow","meaning":"Read c:/users/user/bend2_test/src/app.ts","why":"P7 backlog test"}
+{"name":"r2 text: grep -rn -A 3 foo src | head -50","tool":"Bash","args":{"command":"grep -rn -A 3 foo src | head -50"},"expect":"allow","meaning":"ReadTree c:/users/user/bend2_test/src","why":"P7 backlog test"}
+{"name":"r2 text: date -u","tool":"Bash","args":{"command":"date -u"},"expect":"allow","why":"P7 backlog test"}
+{"name":"r2 text: timeout 30 grep -rn x src","tool":"Bash","args":{"command":"timeout 30 grep -rn x src"},"expect":"allow","meaning":"ReadTree c:/users/user/bend2_test/src","why":"P7 backlog test"}
+{"name":"r2 text: node --version","tool":"Bash","args":{"command":"node --version"},"expect":"allow","meaning":"Known[Inert]","why":"P7 backlog test"}
+{"name":"r2 text: npm ls","tool":"Bash","args":{"command":"npm ls"},"expect":"allow","meaning":"Known[Inert]","why":"P7 backlog test"}
+{"name":"r2 text: tee out/log.txt < src/app.ts","tool":"Bash","args":{"command":"tee out/log.txt < src/app.ts"},"expect":"allow","meaning":"Write c:/users/user/bend2_test/out/log.txt","why":"P7 backlog test"}
+{"name":"r2 text: sort -o out data.txt","tool":"Bash","args":{"command":"sort -o out data.txt"},"expect":"ask","why":"P7 backlog test: -o writes a file and is not modelled"}
+{"name":"r2 text: uniq a b","tool":"Bash","args":{"command":"uniq a b"},"expect":"ask","why":"P7 backlog test: the second operand is an output file"}
+{"name":"r2 text: jq --rawfile a .env .","tool":"Bash","args":{"command":"jq --rawfile a .env ."},"expect":"deny","why":"P7 backlog test: --rawfile is not modelled; round 3, P3: an unknown shell command that names a no-read zone is refused (was ask)"}
+{"name":"r2 text: diff --to-file=x a","tool":"Bash","args":{"command":"diff --to-file=x a"},"expect":"ask","why":"P7 backlog test"}
+{"name":"r2 text: date -s now","tool":"Bash","args":{"command":"date -s now"},"expect":"ask","why":"P7 backlog test: -s sets the clock"}
+{"name":"r2 text: timeout 5 python x.py","tool":"Bash","args":{"command":"timeout 5 python x.py"},"expect":"ask","why":"P7 backlog test: the wrapped command runs code"}
+{"name":"r2 text: env FOO=1 ls","tool":"Bash","args":{"command":"env FOO=1 ls"},"expect":"ask","why":"P7 backlog test: env stays not modelled"}
+{"name":"r2 text: wc -l .env","tool":"Bash","args":{"command":"wc -l .env"},"expect":"deny","why":"P7 backlog test: rule 2 NoReadOrChange .env"}
+{"name":"r2 text: diff -r secrets x","tool":"Bash","args":{"command":"diff -r secrets x"},"expect":"deny","why":"P7 backlog test: rule 2 secrets/"}
+{"name":"r2 text: sort .env","tool":"Bash","args":{"command":"sort .env"},"expect":"deny","why":"P7 backlog test"}
+{"name":"r2 text: tee specs/a.md","tool":"Bash","args":{"command":"tee specs/a.md"},"expect":"deny","why":"P7 backlog test: rule 1 NoChange specs"}
+{"name":"r2 text: grep -A 3 x .env","tool":"Bash","args":{"command":"grep -A 3 x .env"},"expect":"deny","why":"P7 backlog test"}
+{"name":"r2 text: nohup cat src/a.ts ({\"cwds\":[\"C:\\\\Users\\\\user\\\\bend2_test\\\\specs\"]})","tool":"Bash","args":{"command":"nohup cat src/a.ts"},"opts":{"cwds":["C:\\Users\\user\\bend2_test\\specs"]},"expect":"deny","meaning":"Write c:/users/user/bend2_test/specs/nohup.out","why":"P7 backlog test: nohup writes nohup.out in the folder it runs from (specs)"}
+{"name":"r2 text: wc -l src/*.ts","tool":"Bash","args":{"command":"wc -l src/*.ts"},"expect":"allow","meaning":"ReadTree c:/users/user/bend2_test/src","why":"a wildcard reads its folder"}
+{"name":"r2 text: sort -k2 -t, data.csv | uniq -c","tool":"Bash","args":{"command":"sort -k2 -t, data.csv | uniq -c"},"expect":"allow","why":"sort and uniq flags"}
+{"name":"r2 text: uniq -c data.txt","tool":"Bash","args":{"command":"uniq -c data.txt"},"expect":"allow","why":"uniq with one operand"}
+{"name":"r2 text: head -n 5 a.txt | tr a-z A-Z","tool":"Bash","args":{"command":"head -n 5 a.txt | tr a-z A-Z"},"expect":"allow","why":"tr reads no file"}
+{"name":"r2 text: cat -n src/app.ts","tool":"Bash","args":{"command":"cat -n src/app.ts"},"expect":"allow","why":"cat -n"}
+{"name":"r2 text: tail -f -n 20 log.txt","tool":"Bash","args":{"command":"tail -f -n 20 log.txt"},"expect":"allow","why":"tail -f"}
+{"name":"r2 text: tail --follow=name --retry log.txt","tool":"Bash","args":{"command":"tail --follow=name --retry log.txt"},"expect":"allow","why":"tail long flags"}
+{"name":"r2 text: grep -rn --include=*.ts --exclude-dir=node_modules -C2 foo src","tool":"Bash","args":{"command":"grep -rn --include=*.ts --exclude-dir=node_modules -C2 foo src"},"expect":"allow","meaning":"ReadTree c:/users/user/bend2_test/src","why":"grep -C attached, include and exclude-dir keep the tree read"}
+{"name":"r2 text: grep --color=never -m 5 -P foo src/app.ts","tool":"Bash","args":{"command":"grep --color=never -m 5 -P foo src/app.ts"},"expect":"allow","why":"grep --color= -m -P"}
+{"name":"r2 text: grep -A x foo src/app.ts","tool":"Bash","args":{"command":"grep -A x foo src/app.ts"},"expect":"ask","why":"grep -A needs a number"}
+{"name":"r2 text: grep -f .env src/app.ts","tool":"Bash","args":{"command":"grep -f .env src/app.ts"},"expect":"deny","meaning":"Read c:/users/user/bend2_test/.env","why":"grep -f reads its pattern file"}
+{"name":"r2 text: grep --exclude-from=.env foo src/app.ts","tool":"Bash","args":{"command":"grep --exclude-from=.env foo src/app.ts"},"expect":"deny","why":"--exclude-from reads its file"}
+{"name":"r2 text: cut -c1-10 .env","tool":"Bash","args":{"command":"cut -c1-10 .env"},"expect":"deny","why":"rule 2"}
+{"name":"r2 text: ls -la --color=auto src","tool":"Bash","args":{"command":"ls -la --color=auto src"},"expect":"allow","why":"ls accepts every flag"}
+{"name":"r2 text: ls -lhS --group-directories-first src","tool":"Bash","args":{"command":"ls -lhS --group-directories-first src"},"expect":"allow","why":"ls accepts every flag"}
+{"name":"r2 text: jq .version package.json","tool":"Bash","args":{"command":"jq .version package.json"},"expect":"allow","meaning":"Read c:/users/user/bend2_test/package.json","why":"jq filter then files"}
+{"name":"r2 text: jq -r --arg v 1 .name package.json","tool":"Bash","args":{"command":"jq -r --arg v 1 .name package.json"},"expect":"allow","why":"jq --arg takes two values"}
+{"name":"r2 text: jq --indent 4 -S . package.json","tool":"Bash","args":{"command":"jq --indent 4 -S . package.json"},"expect":"allow","why":"jq --indent takes one value"}
+{"name":"r2 text: jq . secrets/a.json","tool":"Bash","args":{"command":"jq . secrets/a.json"},"expect":"deny","why":"rule 2"}
+{"name":"r2 text: jq -f prog.jq package.json","tool":"Bash","args":{"command":"jq -f prog.jq package.json"},"expect":"ask","why":"jq -f is not modelled"}
+{"name":"r2 text: jq 'import \"x\" as x; .' package.json","tool":"Bash","args":{"command":"jq 'import \"x\" as x; .' package.json"},"expect":"ask","why":"a jq module import is not modelled"}
+{"name":"r2 text: jq --arg v","tool":"Bash","args":{"command":"jq --arg v"},"expect":"ask","why":"jq --arg without its values"}
+{"name":"r2 text: diff -u a.txt b.txt","tool":"Bash","args":{"command":"diff -u a.txt b.txt"},"expect":"allow","why":"diff reads both"}
+{"name":"r2 text: diff . other","tool":"Bash","args":{"command":"diff . other"},"expect":"ask","why":"a folder operand reads the files in it: a tree read over .env asks (D4)"}
+{"name":"r2 text: md5sum src/app.ts","tool":"Bash","args":{"command":"md5sum src/app.ts"},"expect":"allow","why":"md5sum reads"}
+{"name":"r2 text: md5sum -c sums.txt","tool":"Bash","args":{"command":"md5sum -c sums.txt"},"expect":"ask","why":"md5sum -c reads the files named inside its list"}
+{"name":"r2 text: sha256sum a.txt b.txt","tool":"Bash","args":{"command":"sha256sum a.txt b.txt"},"expect":"allow","why":"sha256sum reads"}
+{"name":"r2 text: base64 -o out a.txt","tool":"Bash","args":{"command":"base64 -o out a.txt"},"expect":"ask","why":"base64 -o is not modelled"}
+{"name":"r2 text: od -An -tx1 -N 16 a.bin","tool":"Bash","args":{"command":"od -An -tx1 -N 16 a.bin"},"expect":"allow","why":"od flags"}
+{"name":"r2 text: nl -ba src/app.ts","tool":"Bash","args":{"command":"nl -ba src/app.ts"},"expect":"allow","why":"nl"}
+{"name":"r2 text: column -t -s, data.csv","tool":"Bash","args":{"command":"column -t -s, data.csv"},"expect":"allow","why":"column"}
+{"name":"r2 text: comm -12 a.txt b.txt","tool":"Bash","args":{"command":"comm -12 a.txt b.txt"},"expect":"allow","why":"comm"}
+{"name":"r2 text: stat -c %s src/app.ts","tool":"Bash","args":{"command":"stat -c %s src/app.ts"},"expect":"allow","why":"stat reads"}
+{"name":"r2 text: stat .env","tool":"Bash","args":{"command":"stat .env"},"expect":"deny","why":"stat counts as a read of .env"}
+{"name":"r2 text: file src/app.ts","tool":"Bash","args":{"command":"file src/app.ts"},"expect":"allow","why":"file reads"}
+{"name":"r2 text: du -sh src","tool":"Bash","args":{"command":"du -sh src"},"expect":"allow","meaning":"ListDir c:/users/user/bend2_test/src","why":"du lists"}
+{"name":"r2 text: du -h --max-depth=1","tool":"Bash","args":{"command":"du -h --max-depth=1"},"expect":"allow","why":"du with no operand lists the current folder"}
+{"name":"r2 text: tree -L 2 -a src","tool":"Bash","args":{"command":"tree -L 2 -a src"},"expect":"allow","why":"tree lists"}
+{"name":"r2 text: realpath src","tool":"Bash","args":{"command":"realpath src"},"expect":"allow","why":"realpath prints a name"}
+{"name":"r2 text: basename src/app.ts .ts","tool":"Bash","args":{"command":"basename src/app.ts .ts"},"expect":"allow","why":"basename"}
+{"name":"r2 text: dirname src/app.ts","tool":"Bash","args":{"command":"dirname src/app.ts"},"expect":"allow","why":"dirname"}
+{"name":"r2 text: readlink -f src","tool":"Bash","args":{"command":"readlink -f src"},"expect":"allow","why":"readlink"}
+{"name":"r2 text: which -a node","tool":"Bash","args":{"command":"which -a node"},"expect":"allow","why":"which"}
+{"name":"r2 text: type ls","tool":"Bash","args":{"command":"type ls"},"expect":"allow","why":"type"}
+{"name":"r2 text: command -v node","tool":"Bash","args":{"command":"command -v node"},"expect":"allow","why":"command -v prints how a name runs"}
+{"name":"r2 text: command rm x","tool":"Bash","args":{"command":"command rm x"},"expect":"ask","why":"command without -v runs the command"}
+{"name":"r2 text: test -f src/app.ts && echo yes","tool":"Bash","args":{"command":"test -f src/app.ts && echo yes"},"expect":"allow","why":"test"}
+{"name":"r2 text: [ -d src ]","tool":"Bash","args":{"command":"[ -d src ]"},"expect":"allow","why":"the [ form of test"}
+{"name":"r2 text: false || true","tool":"Bash","args":{"command":"false || true"},"expect":"allow","why":"false"}
+{"name":"r2 text: sleep 2","tool":"Bash","args":{"command":"sleep 2"},"expect":"allow","why":"sleep"}
+{"name":"r2 text: seq -w 1 10","tool":"Bash","args":{"command":"seq -w 1 10"},"expect":"allow","why":"seq"}
+{"name":"r2 text: whoami","tool":"Bash","args":{"command":"whoami"},"expect":"allow","why":"whoami"}
+{"name":"r2 text: uname -a","tool":"Bash","args":{"command":"uname -a"},"expect":"allow","why":"uname"}
+{"name":"r2 text: nproc","tool":"Bash","args":{"command":"nproc"},"expect":"allow","why":"nproc"}
+{"name":"r2 text: hostname","tool":"Bash","args":{"command":"hostname"},"expect":"allow","why":"hostname with no argument"}
+{"name":"r2 text: hostname evil","tool":"Bash","args":{"command":"hostname evil"},"expect":"ask","why":"hostname with an argument may set the name"}
+{"name":"r2 text: date +%Y-%m-%d","tool":"Bash","args":{"command":"date +%Y-%m-%d"},"expect":"allow","why":"a +FORMAT operand"}
+{"name":"r2 text: date 010112002026","tool":"Bash","args":{"command":"date 010112002026"},"expect":"ask","why":"any other operand sets the clock"}
+{"name":"r2 text: date -r .env","tool":"Bash","args":{"command":"date -r .env"},"expect":"deny","why":"date -r reads the file (counted as a read)"}
+{"name":"r2 text: npm --version","tool":"Bash","args":{"command":"npm --version"},"expect":"allow","why":"npm --version"}
+{"name":"r2 text: npm -v","tool":"Bash","args":{"command":"npm -v"},"expect":"allow","why":"npm -v"}
+{"name":"r2 text: npm ls --depth=0","tool":"Bash","args":{"command":"npm ls --depth=0"},"expect":"allow","why":"npm ls flags"}
+{"name":"r2 text: npm list react --all","tool":"Bash","args":{"command":"npm list react --all"},"expect":"allow","why":"npm list with a package name"}
+{"name":"r2 text: npm ls --global","tool":"Bash","args":{"command":"npm ls --global"},"expect":"ask","why":"npm ls: other flags are not modelled"}
+{"name":"r2 text: git --version","tool":"Bash","args":{"command":"git --version"},"expect":"allow","why":"git --version"}
+{"name":"r2 text: python --version","tool":"Bash","args":{"command":"python --version"},"expect":"allow","why":"python --version"}
+{"name":"r2 text: python3 -V","tool":"Bash","args":{"command":"python3 -V"},"expect":"allow","why":"python3 -V"}
+{"name":"r2 text: py --version","tool":"Bash","args":{"command":"py --version"},"expect":"allow","why":"py --version"}
+{"name":"r2 text: python x.py","tool":"Bash","args":{"command":"python x.py"},"expect":"ask","why":"python runs code"}
+{"name":"r2 text: node --version x","tool":"Bash","args":{"command":"node --version x"},"expect":"ask","why":"node with more than --version runs code"}
+{"name":"r2 text: tee -a out.txt < src/app.ts","tool":"Bash","args":{"command":"tee -a out.txt < src/app.ts"},"expect":"allow","why":"tee -a writes its file"}
+{"name":"r2 text: tee *.md","tool":"Bash","args":{"command":"tee *.md"},"expect":"deny","why":"R2M-3: tee is not understood with a wildcard, and *.md at the project root can match BEND_RULES.md, so it is refused (was ask)"}
+{"name":"r2 text: timeout -s KILL 10 ls src","tool":"Bash","args":{"command":"timeout -s KILL 10 ls src"},"expect":"allow","why":"timeout with a signal"}
+{"name":"r2 text: timeout --preserve-status 1m cat src/app.ts","tool":"Bash","args":{"command":"timeout --preserve-status 1m cat src/app.ts"},"expect":"allow","why":"timeout long flag and a unit"}
+{"name":"r2 text: timeout --bogus 5 ls","tool":"Bash","args":{"command":"timeout --bogus 5 ls"},"expect":"ask","why":"an unknown timeout flag"}
+{"name":"r2 text: timeout 5","tool":"Bash","args":{"command":"timeout 5"},"expect":"ask","why":"timeout with no command"}
+{"name":"r2 text: timeout 5 rm -rf specs","tool":"Bash","args":{"command":"timeout 5 rm -rf specs"},"expect":"deny","why":"the wrapped command keeps its meaning"}
+{"name":"r2 text: timeout 5 node C:/Users/user/.claude/local-plugins/bend-guard/tools/approve.mjs C:/Users/user/bend2_test","tool":"Bash","args":{"command":"timeout 5 node C:/Users/user/.claude/local-plugins/bend-guard/tools/approve.mjs C:/Users/user/bend2_test"},"expect":"deny","why":"the approve tool through a wrapper is still self-protected"}
+{"name":"r2 text: nohup timeout 5 node C:/Users/user/.claude/local-plugins/bend-guard/tools/approve.mjs C:/Users/user/bend2_test","tool":"Bash","args":{"command":"nohup timeout 5 node C:/Users/user/.claude/local-plugins/bend-guard/tools/approve.mjs C:/Users/user/bend2_test"},"expect":"deny","why":"two wrappers"}
+{"name":"r2 text: timeout --bogus 5 node C:/Users/user/.claude/local-plugins/bend-guard/tools/approve.mjs","tool":"Bash","args":{"command":"timeout --bogus 5 node C:/Users/user/.claude/local-plugins/bend-guard/tools/approve.mjs"},"expect":"deny","why":"an unmodelled wrapper keeps the approve-tool check"}
+{"name":"r2 text: nohup ls src","tool":"Bash","args":{"command":"nohup ls src"},"expect":"allow","meaning":"Write c:/users/user/bend2_test/nohup.out","why":"nohup.out in the project folder is an ordinary write"}
+{"name":"r2 text: xargs cat","tool":"Bash","args":{"command":"xargs cat"},"expect":"ask","why":"xargs stays not modelled"}
+{"name":"r2 text: nice ls","tool":"Bash","args":{"command":"nice ls"},"expect":"ask","why":"nice stays not modelled"}
+{"name":"r2 text: sed -n '1,40p' src/app.ts","tool":"Bash","args":{"command":"sed -n '1,40p' src/app.ts"},"expect":"allow","meaning":"Known[Read c:/users/user/bend2_test/src/app.ts]","why":"P9 backlog test"}
+{"name":"r2 text: sed -n 1,20p src/app.ts","tool":"Bash","args":{"command":"sed -n 1,20p src/app.ts"},"expect":"allow","why":"P9 backlog test"}
+{"name":"r2 text: sed -E 's/a|b/c/g' src/app.ts","tool":"Bash","args":{"command":"sed -E 's/a|b/c/g' src/app.ts"},"expect":"allow","why":"P9 backlog test"}
+{"name":"r2 text: sed -n '/foo/,/bar/p' src/app.ts","tool":"Bash","args":{"command":"sed -n '/foo/,/bar/p' src/app.ts"},"expect":"allow","why":"P9 backlog test"}
+{"name":"r2 text: cat x | sed 's/a/b/'","tool":"Bash","args":{"command":"cat x | sed 's/a/b/'"},"expect":"allow","why":"P9 backlog test"}
+{"name":"r2 text: sed -i 's/a/b/' src/app.ts","tool":"Bash","args":{"command":"sed -i 's/a/b/' src/app.ts"},"expect":"allow","meaning":"Write c:/users/user/bend2_test/src/app.ts","why":"P9 backlog test"}
+{"name":"r2 text: awk -F: '{print $2}' src/app.ts","tool":"Bash","args":{"command":"awk -F: '{print $2}' src/app.ts"},"expect":"allow","why":"P9 backlog test"}
+{"name":"r2 text: awk '{print $1}' src/a.ts | sort | uniq -c","tool":"Bash","args":{"command":"awk '{print $1}' src/a.ts | sort | uniq -c"},"expect":"allow","why":"P9 backlog test"}
+{"name":"r2 text: find . -name '*.ts'","tool":"Bash","args":{"command":"find . -name '*.ts'"},"expect":"allow","meaning":"ListDir c:/users/user/bend2_test","why":"P9 backlog test"}
+{"name":"r2 text: find src -type f -maxdepth 2","tool":"Bash","args":{"command":"find src -type f -maxdepth 2"},"expect":"allow","meaning":"ListDir c:/users/user/bend2_test/src","why":"P9 backlog test"}
+{"name":"r2 text: sed -n '/x/w out' f","tool":"Bash","args":{"command":"sed -n '/x/w out' f"},"expect":"ask","why":"P9 backlog test: w writes a file"}
+{"name":"r2 text: sed 's/a/b/e' f","tool":"Bash","args":{"command":"sed 's/a/b/e' f"},"expect":"ask","why":"P9 backlog test: the e flag runs a command"}
+{"name":"r2 text: sed -f script f","tool":"Bash","args":{"command":"sed -f script f"},"expect":"ask","why":"P9 backlog test"}
+{"name":"r2 text: sed -i.bak s/a/b/ f","tool":"Bash","args":{"command":"sed -i.bak s/a/b/ f"},"expect":"ask","why":"P9 backlog test: a backup suffix writes another file"}
+{"name":"r2 text: sed '1r /etc/x' f","tool":"Bash","args":{"command":"sed '1r /etc/x' f"},"expect":"ask","why":"P9 backlog test"}
+{"name":"r2 text: sed '{p}' f","tool":"Bash","args":{"command":"sed '{p}' f"},"expect":"ask","why":"P9 backlog test"}
+{"name":"r2 text: awk '{print > \"out\"}' f","tool":"Bash","args":{"command":"awk '{print > \"out\"}' f"},"expect":"ask","why":"P9 backlog test"}
+{"name":"r2 text: awk '{system(\"rm x\")}' f","tool":"Bash","args":{"command":"awk '{system(\"rm x\")}' f"},"expect":"ask","why":"P9 backlog test"}
+{"name":"r2 text: awk -f p.awk f","tool":"Bash","args":{"command":"awk -f p.awk f"},"expect":"ask","why":"P9 backlog test"}
+{"name":"r2 text: gawk -i inplace '{print}' f","tool":"Bash","args":{"command":"gawk -i inplace '{print}' f"},"expect":"ask","why":"P9 backlog test"}
+{"name":"r2 text: awk '$3 > 5' f","tool":"Bash","args":{"command":"awk '$3 > 5' f"},"expect":"ask","why":"P9 backlog test: > is refused even as a comparison (fail closed)"}
+{"name":"r2 text: find . -delete","tool":"Bash","args":{"command":"find . -delete"},"expect":"ask","why":"P9 backlog test"}
+{"name":"r2 text: find . -exec rm {} ;","tool":"Bash","args":{"command":"find . -exec rm {} ;"},"expect":"ask","why":"P9 backlog test"}
+{"name":"r2 text: find . -fprint out","tool":"Bash","args":{"command":"find . -fprint out"},"expect":"ask","why":"P9 backlog test"}
+{"name":"r2 text: find -L .","tool":"Bash","args":{"command":"find -L ."},"expect":"ask","why":"P9 backlog test"}
+{"name":"r2 text: sed -n 1p .env","tool":"Bash","args":{"command":"sed -n 1p .env"},"expect":"deny","why":"P9 backlog test"}
+{"name":"r2 text: sed -i 's/a/b/' specs/a.md","tool":"Bash","args":{"command":"sed -i 's/a/b/' specs/a.md"},"expect":"deny","why":"P9 backlog test"}
+{"name":"r2 text: awk '{print}' secrets/x","tool":"Bash","args":{"command":"awk '{print}' secrets/x"},"expect":"deny","why":"P9 backlog test"}
+{"name":"r2 text: sed -n '$p' a.txt","tool":"Bash","args":{"command":"sed -n '$p' a.txt"},"expect":"allow","why":"sed $ address"}
+{"name":"r2 text: sed '5~2d' a.txt","tool":"Bash","args":{"command":"sed '5~2d' a.txt"},"expect":"allow","why":"sed N~K address"}
+{"name":"r2 text: sed -n '10,+5p' a.txt","tool":"Bash","args":{"command":"sed -n '10,+5p' a.txt"},"expect":"allow","why":"sed N,+K address"}
+{"name":"r2 text: sed '/^#/!d' a.txt","tool":"Bash","args":{"command":"sed '/^#/!d' a.txt"},"expect":"allow","why":"sed ! after an address"}
+{"name":"r2 text: sed -e 's/a/b/' -e 's/c/d/2' a.txt","tool":"Bash","args":{"command":"sed -e 's/a/b/' -e 's/c/d/2' a.txt"},"expect":"allow","why":"several -e scripts"}
+{"name":"r2 text: sed 's|a/b|c|g;p' a.txt","tool":"Bash","args":{"command":"sed 's|a/b|c|g;p' a.txt"},"expect":"allow","why":"sed s with | as delimiter, then p"}
+{"name":"r2 text: sed 's/a\\/b/c/' a.txt","tool":"Bash","args":{"command":"sed 's/a\\/b/c/' a.txt"},"expect":"allow","why":"an escaped delimiter stays in the regex"}
+{"name":"r2 text: sed y/abc/xyz/ a.txt","tool":"Bash","args":{"command":"sed y/abc/xyz/ a.txt"},"expect":"allow","why":"sed y"}
+{"name":"r2 text: sed -n '1p;2q' a.txt","tool":"Bash","args":{"command":"sed -n '1p;2q' a.txt"},"expect":"allow","why":"sed q"}
+{"name":"r2 text: sed --quiet --expression=1p a.txt","tool":"Bash","args":{"command":"sed --quiet --expression=1p a.txt"},"expect":"allow","why":"sed long flags"}
+{"name":"r2 text: sed 's/a/b/w out' a.txt","tool":"Bash","args":{"command":"sed 's/a/b/w out' a.txt"},"expect":"ask","why":"the w flag of s writes a file"}
+{"name":"r2 text: sed 's/a/b/' -s a.txt b.txt","tool":"Bash","args":{"command":"sed 's/a/b/' -s a.txt b.txt"},"expect":"ask","why":"sed -s is not modelled"}
+{"name":"r2 text: sed -ie s/a/b/ a.txt","tool":"Bash","args":{"command":"sed -ie s/a/b/ a.txt"},"expect":"ask","why":"GNU sed reads -ie as -i with the backup suffix e"}
+{"name":"r2 text: sed --in-place=.bak s/a/b/ a.txt","tool":"Bash","args":{"command":"sed --in-place=.bak s/a/b/ a.txt"},"expect":"ask","why":"a backup suffix on --in-place"}
+{"name":"r2 text: sed 'e ls' a.txt","tool":"Bash","args":{"command":"sed 'e ls' a.txt"},"expect":"ask","why":"the e command runs a command"}
+{"name":"r2 text: sed '1a hello' a.txt","tool":"Bash","args":{"command":"sed '1a hello' a.txt"},"expect":"ask","why":"a is not modelled"}
+{"name":"r2 text: sed ':a;N;ba' a.txt","tool":"Bash","args":{"command":"sed ':a;N;ba' a.txt"},"expect":"ask","why":"labels and branches"}
+{"name":"r2 text: sed","tool":"Bash","args":{"command":"sed"},"expect":"ask","why":"no script"}
+{"name":"r2 text: sed -i s/a/b/ specs/*.md","tool":"Bash","args":{"command":"sed -i s/a/b/ specs/*.md"},"expect":"deny","why":"a wildcard under -i writes the folder it can reach"}
+{"name":"r2 text: awk -v OFS=, '{print $1, $2}' a.txt","tool":"Bash","args":{"command":"awk -v OFS=, '{print $1, $2}' a.txt"},"expect":"allow","why":"awk -v"}
+{"name":"r2 text: awk 'NF' a.txt n=1 b.txt","tool":"Bash","args":{"command":"awk 'NF' a.txt n=1 b.txt"},"expect":"allow","why":"an operand assignment is not a file"}
+{"name":"r2 text: awk -v ARGC=3 '{print}' a.txt","tool":"Bash","args":{"command":"awk -v ARGC=3 '{print}' a.txt"},"expect":"ask","why":"assigning a special variable"}
+{"name":"r2 text: awk 'BEGIN{ARGV[1]=\".env\"} {print}' a.txt","tool":"Bash","args":{"command":"awk 'BEGIN{ARGV[1]=\".env\"} {print}' a.txt"},"expect":"deny","why":"ARGV can choose other files; round 3, P3: an unknown shell command that names a no-read zone is refused (was ask)"}
+{"name":"r2 text: awk '{f=\"sys\" \"tem\"; @f(\"x\")}' a.txt","tool":"Bash","args":{"command":"awk '{f=\"sys\" \"tem\"; @f(\"x\")}' a.txt"},"expect":"ask","why":"indirect calls"}
+{"name":"r2 text: awk '{print | \"sh\"}' a.txt","tool":"Bash","args":{"command":"awk '{print | \"sh\"}' a.txt"},"expect":"ask","why":"a pipe runs a command"}
+{"name":"r2 text: awk","tool":"Bash","args":{"command":"awk"},"expect":"ask","why":"no program"}
+{"name":"r2 text: find src -name '*.ts' -o -name '*.js' -print","tool":"Bash","args":{"command":"find src -name '*.ts' -o -name '*.js' -print"},"expect":"allow","why":"find -o and -print"}
+{"name":"r2 text: find src/* -maxdepth 0","tool":"Bash","args":{"command":"find src/* -maxdepth 0"},"expect":"allow","why":"a wildcard after a folder part cannot expand into a find word"}
+{"name":"r2 text: find . -path ./node_modules -prune -o -type f -print0","tool":"Bash","args":{"command":"find . -path ./node_modules -prune -o -type f -print0"},"expect":"allow","why":"find -prune and -print0"}
+{"name":"r2 text: find * -name x","tool":"Bash","args":{"command":"find * -name x"},"expect":"deny","why":"R2M-3: find with a bare wildcard is not understood, and * at the project root can match BEND_RULES.md, so it is refused (was ask)"}
+{"name":"r2 text: find . -name '*'","tool":"Bash","args":{"command":"find . -name '*'"},"expect":"ask","why":"a wildcard with no . could expand into a find word"}
+{"name":"r2 text: find . -name x -ok rm {} ;","tool":"Bash","args":{"command":"find . -name x -ok rm {} ;"},"expect":"ask","why":"-ok runs a command"}
+{"name":"r2 text: find . -name","tool":"Bash","args":{"command":"find . -name"},"expect":"ask","why":"a test with no value"}
+{"name":"r2 text: find . -name '*.ts' -newer .env","tool":"Bash","args":{"command":"find . -name '*.ts' -newer .env"},"expect":"deny","why":"-newer reads its file"}
